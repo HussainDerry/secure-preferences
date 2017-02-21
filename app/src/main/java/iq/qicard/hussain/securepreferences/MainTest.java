@@ -4,15 +4,13 @@ import java.security.SecureRandom;
 import java.util.UUID;
 
 import iq.qicard.hussain.securepreferences.security.CipherAES;
+import iq.qicard.hussain.securepreferences.util.AesCipherHelper;
 
 public class MainTest {
 
     public static void main(String[] args) throws Exception{
 
-        byte[] iv = new byte[16];
-        new SecureRandom().nextBytes(iv);
-
-        CipherAES mEncryptor = new CipherAES("thisissupposedtobeastrongpassword".toCharArray(), iv);
+        CipherAES mEncryptor = AesCipherHelper.generateFromSinglePassphrase("thisisasinglepassphrase");
 
         long startTime = System.currentTimeMillis();
         for(int i = 0; i < 10000; i ++){
