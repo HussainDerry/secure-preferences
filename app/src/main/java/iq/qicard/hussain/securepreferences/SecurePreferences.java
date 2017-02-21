@@ -8,8 +8,6 @@ import android.support.annotation.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,6 +48,16 @@ public class SecurePreferences implements SharedPreferences{
         }
     }
 
+    private String decryptFromBase64(String base64Data){
+        try{
+            byte[] data = Base64.decodeBase64(base64Data);
+            byte[] decrypted = mAES.decrypt(data);
+            return new String(decrypted, CHARSET);
+        }catch(UnsupportedEncodingException e){
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
+
     @Override
     public Map<String, ?> getAll() {
         return null;
@@ -57,33 +65,34 @@ public class SecurePreferences implements SharedPreferences{
 
     @Nullable
     @Override
-    public String getString(String s, String s1) {
-        return null;
+    public String getString(String key, String defValue){
+        final String encryptedData = mProxyPreferences.getString(generateKeyHash(key), null);
+        return encryptedData != null ? decryptFromBase64(encryptedData) : defValue;
     }
 
     @Nullable
     @Override
-    public Set<String> getStringSet(String s, Set<String> set) {
+    public Set<String> getStringSet(String key, Set<String> set) {
         return null;
     }
 
     @Override
-    public int getInt(String s, int i) {
+    public int getInt(String key, int defValue) {
         return 0;
     }
 
     @Override
-    public long getLong(String s, long l) {
+    public long getLong(String key, long defValue) {
         return 0;
     }
 
     @Override
-    public float getFloat(String s, float v) {
+    public float getFloat(String key, float defValue) {
         return 0;
     }
 
     @Override
-    public boolean getBoolean(String s, boolean b) {
+    public boolean getBoolean(String key, boolean defValue) {
         return false;
     }
 
@@ -109,7 +118,7 @@ public class SecurePreferences implements SharedPreferences{
 
     public class Editor implements SharedPreferences.Editor{
 
-        private SharedPreferences.Editor mProxyEditor;
+        protected SharedPreferences.Editor mProxyEditor;
 
         public Editor(){
             this.mProxyEditor = SecurePreferences.this.mProxyPreferences.edit();
@@ -128,9 +137,8 @@ public class SecurePreferences implements SharedPreferences{
             String hashedKey = generateKeyHash(key);
             Set<String> encryptedSet = new HashSet<>();
 
-            Iterator<String> dataIterator = set.iterator();
-            while(dataIterator.hasNext()){
-                encryptedSet.add(encryptToBase64(dataIterator.next()));
+            for(String temp : set) {
+                encryptedSet.add(encryptToBase64(temp));
             }
 
             mProxyEditor.putStringSet(hashedKey, encryptedSet);
