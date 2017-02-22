@@ -33,4 +33,6 @@ dependencies {
     })
     androidTestCompile 'junit:junit:' + rootProject.junitVersion;
     androidTestCompile 'org.mockito:mockito-core:' + rootProject.mockitoVersion;
+
+    compile group: 'com.madgag.spongycastle', name: 'core', version: '1.54.0.0'
 }

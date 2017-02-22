@@ -2,7 +2,6 @@ package iq.qicard.hussain.securepreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 import android.util.Base64;
 
 import java.io.UnsupportedEncodingException;
@@ -62,14 +61,12 @@ public class SecurePreferences implements SharedPreferences{
         throw new UnsupportedOperationException("Operation Not Supported!");
     }
 
-    @Nullable
     @Override
     public String getString(String key, String defValue){
         final String encryptedData = mProxyPreferences.getString(generateKeyHash(key), null);
         return encryptedData != null ? decryptFromBase64(encryptedData) : defValue;
     }
 
-    @Nullable
     @Override
     public Set<String> getStringSet(String key, Set<String> defSet) {
         Set<String> encryptedSet = mProxyPreferences.getStringSet(generateKeyHash(key), null);
