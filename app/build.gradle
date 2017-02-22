@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
@@ -6,7 +6,6 @@ android {
     buildToolsVersion "24.0.2"
 
     defaultConfig {
-        applicationId "iq.qicard.hussain.securepreferences"
         minSdkVersion 14
         targetSdkVersion 24
         versionCode 1
@@ -32,7 +31,6 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    testCompile 'junit:junit:4.12'
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
+    androidTestCompile 'junit:junit:' + rootProject.junitVersion;
+    androidTestCompile 'org.mockito:mockito-core:' + rootProject.mockitoVersion;
 }

@@ -1,10 +1,9 @@
 package iq.qicard.hussain.securepreferences;
 
-import org.apache.commons.codec.binary.Base64;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+import android.util.Base64;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
@@ -17,23 +16,23 @@ import iq.qicard.hussain.securepreferences.util.AesCipherHelper;
 
 public class SecurePreferences implements SharedPreferences{
 
-    private static final String DEFAULT_FILENAME = "secured_prefs";
     private static final String CHARSET = "UTF-8";
     private final CipherAES mAES;
-
-    private Context mContext;
     private SharedPreferences mProxyPreferences;
 
+    public static SecurePreferences getInstance(Context context, String filename, String password){
+        return new SecurePreferences(context.getApplicationContext(), filename, password);
+    }
+
     private SecurePreferences(Context context, String fileName, String password) {
-        this.mContext = context;
         this.mAES = AesCipherHelper.generateFromSinglePassphrase(password);
-        this.mProxyPreferences = mContext.getSharedPreferences(fileName, Context.MODE_PRIVATE);
+        this.mProxyPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 
     private String generateKeyHash(String key){
         try{
             byte[] mBytes = CipherSHA.hashUsingSHA256(key.getBytes(CHARSET));
-            return Base64.encodeBase64URLSafeString(mBytes);
+            return new String(Base64.encode(mBytes, Base64.NO_WRAP), CHARSET);
         }catch(UnsupportedEncodingException e){
             throw new IllegalStateException(e.getMessage());
         }
@@ -42,7 +41,7 @@ public class SecurePreferences implements SharedPreferences{
     private String encryptToBase64(String data){
         try{
             byte[] mBytes = mAES.encrypt(data.getBytes(CHARSET));
-            return Base64.encodeBase64URLSafeString(mBytes);
+            return new String(Base64.encode(mBytes, Base64.NO_WRAP), CHARSET);
         }catch(UnsupportedEncodingException e){
             throw new IllegalStateException(e.getMessage());
         }
@@ -50,7 +49,7 @@ public class SecurePreferences implements SharedPreferences{
 
     private String decryptFromBase64(String base64Data){
         try{
-            byte[] data = Base64.decodeBase64(base64Data);
+            byte[] data = Base64.decode(base64Data, Base64.NO_WRAP);
             byte[] decrypted = mAES.decrypt(data);
             return new String(decrypted, CHARSET);
         }catch(UnsupportedEncodingException e){
@@ -60,7 +59,7 @@ public class SecurePreferences implements SharedPreferences{
 
     @Override
     public Map<String, ?> getAll() {
-        return null;
+        throw new UnsupportedOperationException("Operation Not Supported!");
     }
 
     @Nullable
@@ -72,28 +71,42 @@ public class SecurePreferences implements SharedPreferences{
 
     @Nullable
     @Override
-    public Set<String> getStringSet(String key, Set<String> set) {
-        return null;
+    public Set<String> getStringSet(String key, Set<String> defSet) {
+        Set<String> encryptedSet = mProxyPreferences.getStringSet(generateKeyHash(key), null);
+
+        if(encryptedSet != null){
+            Set<String> plainSet = new HashSet<>();
+            for(String temp : encryptedSet) {
+                plainSet.add(decryptFromBase64(temp));
+            }
+            return plainSet;
+        }else{
+            return defSet;
+        }
     }
 
     @Override
     public int getInt(String key, int defValue) {
-        return 0;
+        final String data = getString(key, null);
+        return data != null ? Integer.parseInt(data) : defValue;
     }
 
     @Override
     public long getLong(String key, long defValue) {
-        return 0;
+        final String data = getString(key, null);
+        return data != null ? Long.parseLong(data) : defValue;
     }
 
     @Override
     public float getFloat(String key, float defValue) {
-        return 0;
+        final String data = getString(key, null);
+        return data != null ? Float.parseFloat(data) : defValue;
     }
 
     @Override
     public boolean getBoolean(String key, boolean defValue) {
-        return false;
+        final String data = getString(key, null);
+        return data != null ? Boolean.parseBoolean(data) : defValue;
     }
 
     @Override
@@ -102,7 +115,7 @@ public class SecurePreferences implements SharedPreferences{
     }
 
     @Override
-    public SharedPreferences.Editor edit() {
+    public SecurePreferences.Editor edit() {
         return new Editor();
     }
 
@@ -125,7 +138,7 @@ public class SecurePreferences implements SharedPreferences{
         }
 
         @Override
-        public SharedPreferences.Editor putString(String key, String data){
+        public SecurePreferences.Editor putString(String key, String data){
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(data);
             mProxyEditor.putString(hashedKey, encryptedData);
@@ -133,7 +146,7 @@ public class SecurePreferences implements SharedPreferences{
         }
 
         @Override
-        public SharedPreferences.Editor putStringSet(String key, Set<String> set) {
+        public SecurePreferences.Editor putStringSet(String key, Set<String> set) {
             String hashedKey = generateKeyHash(key);
             Set<String> encryptedSet = new HashSet<>();
 
@@ -146,7 +159,7 @@ public class SecurePreferences implements SharedPreferences{
         }
 
         @Override
-        public SharedPreferences.Editor putInt(String key, int data) {
+        public SecurePreferences.Editor putInt(String key, int data) {
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(Integer.toString(data));
             mProxyEditor.putString(hashedKey, encryptedData);
@@ -154,7 +167,7 @@ public class SecurePreferences implements SharedPreferences{
         }
 
         @Override
-        public SharedPreferences.Editor putLong(String key, long data){
+        public SecurePreferences.Editor putLong(String key, long data){
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(Long.toString(data));
             mProxyEditor.putString(hashedKey, encryptedData);
@@ -162,7 +175,7 @@ public class SecurePreferences implements SharedPreferences{
         }
 
         @Override
-        public SharedPreferences.Editor putFloat(String key, float data) {
+        public SecurePreferences.Editor putFloat(String key, float data) {
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(Float.toString(data));
             mProxyEditor.putString(hashedKey, encryptedData);
@@ -170,7 +183,7 @@ public class SecurePreferences implements SharedPreferences{
         }
 
         @Override
-        public SharedPreferences.Editor putBoolean(String key, boolean data) {
+        public SecurePreferences.Editor putBoolean(String key, boolean data) {
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(Boolean.toString(data));
             mProxyEditor.putString(hashedKey, encryptedData);
@@ -178,13 +191,13 @@ public class SecurePreferences implements SharedPreferences{
         }
 
         @Override
-        public SharedPreferences.Editor remove(String key) {
+        public SecurePreferences.Editor remove(String key) {
             mProxyEditor.remove(generateKeyHash(key));
             return this;
         }
 
         @Override
-        public SharedPreferences.Editor clear() {
+        public SecurePreferences.Editor clear() {
             mProxyEditor.clear();
             return this;
         }
