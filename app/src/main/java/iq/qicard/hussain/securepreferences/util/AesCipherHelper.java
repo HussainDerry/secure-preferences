@@ -2,14 +2,14 @@ package iq.qicard.hussain.securepreferences.util;
 
 import java.util.Arrays;
 
-import iq.qicard.hussain.securepreferences.security.CipherAES;
-import iq.qicard.hussain.securepreferences.security.CipherSHA;
+import iq.qicard.hussain.securepreferences.crypto.CipherAES;
+import iq.qicard.hussain.securepreferences.crypto.CipherSHA;
 
 public class AesCipherHelper {
 
     public static CipherAES generateFromSinglePassphrase(String passphrase){
         char[] mSecretChars = passphrase.toCharArray();
-        return new CipherAES(mSecretChars, generateIvFromHash(ByteUtils.convertCharsToBytes(mSecretChars)));
+        return null;
     }
 
     private static byte[] generateIvFromHash(byte[] data){
@@ -17,4 +17,7 @@ public class AesCipherHelper {
         return Arrays.copyOfRange(mHash, 0, 16);
     }
 
+    private byte[] generateHashedPassword(){
+        return null;
+    }
 }

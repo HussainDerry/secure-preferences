@@ -1,6 +1,6 @@
 package iq.qicard.hussain.securepreferences;
 
-import iq.qicard.hussain.securepreferences.security.CipherAES;
+import iq.qicard.hussain.securepreferences.crypto.CipherAES;
 
 public class AesEncryptorTest {
 

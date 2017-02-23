@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences.security;
+package iq.qicard.hussain.securepreferences.crypto;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

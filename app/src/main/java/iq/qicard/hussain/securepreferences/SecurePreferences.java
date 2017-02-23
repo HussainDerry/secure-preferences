@@ -9,14 +9,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import iq.qicard.hussain.securepreferences.security.CipherAES;
-import iq.qicard.hussain.securepreferences.security.CipherSHA;
-import iq.qicard.hussain.securepreferences.util.AesCipherHelper;
+import iq.qicard.hussain.securepreferences.crypto.CipherSHA;
+import iq.qicard.hussain.securepreferences.crypto.CryptorAES;
 
 public class SecurePreferences implements SharedPreferences{
 
     private static final String CHARSET = "UTF-8";
-    private final CipherAES mAES;
+    private final CryptorAES mCryptor;
     private SharedPreferences mProxyPreferences;
 
     public static SecurePreferences getInstance(Context context, String filename, String password){
@@ -24,14 +23,18 @@ public class SecurePreferences implements SharedPreferences{
     }
 
     private SecurePreferences(Context context, String fileName, String password) {
-        this.mAES = AesCipherHelper.generateFromSinglePassphrase(password);
+        try {
+            this.mCryptor = new CryptorAES(CipherSHA.hashUsingSHA256(password.getBytes(CHARSET)));
+        } catch (UnsupportedEncodingException e) {
+           throw new RuntimeException("UTF-8 Unsupported!");
+        }
         this.mProxyPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 
     private String generateKeyHash(String key){
         try{
             byte[] mBytes = CipherSHA.hashUsingSHA256(key.getBytes(CHARSET));
-            return new String(Base64.encode(mBytes, Base64.NO_WRAP), CHARSET);
+            return new String(Base64.encode(mBytes, Base64.DEFAULT), CHARSET);
         }catch(UnsupportedEncodingException e){
             throw new IllegalStateException(e.getMessage());
         }
@@ -39,8 +42,7 @@ public class SecurePreferences implements SharedPreferences{
 
     private String encryptToBase64(String data){
         try{
-            byte[] mBytes = mAES.encrypt(data.getBytes(CHARSET));
-            return new String(Base64.encode(mBytes, Base64.NO_WRAP), CHARSET);
+            return mCryptor.encryptToBase64(data.getBytes(CHARSET));
         }catch(UnsupportedEncodingException e){
             throw new IllegalStateException(e.getMessage());
         }
@@ -48,8 +50,7 @@ public class SecurePreferences implements SharedPreferences{
 
     private String decryptFromBase64(String base64Data){
         try{
-            byte[] data = Base64.decode(base64Data, Base64.NO_WRAP);
-            byte[] decrypted = mAES.decrypt(data);
+            byte[] decrypted = mCryptor.decryptFromBase64(base64Data);
             return new String(decrypted, CHARSET);
         }catch(UnsupportedEncodingException e){
             throw new IllegalStateException(e.getMessage());
@@ -206,7 +207,7 @@ public class SecurePreferences implements SharedPreferences{
 
         @Override
         public void apply() {
-            mProxyEditor.commit();
+            mProxyEditor.apply();
         }
 
     }

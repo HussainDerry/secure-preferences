@@ -3,6 +3,8 @@ package iq.qicard.hussain.securepreferences;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.core.deps.guava.primitives.Booleans;
+import android.support.test.filters.MediumTest;
+import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Before;
@@ -28,6 +30,10 @@ public class SecurePreferencesTest {
     private static final String PASSWORD = "!@#password#@!";
     private static SecurePreferences mPreferences;
 
+    public SecurePreferencesTest(){
+
+    }
+
     @BeforeClass
     public static void loadContext(){
         Context appContext = InstrumentationRegistry.getTargetContext();
@@ -36,11 +42,13 @@ public class SecurePreferencesTest {
     }
 
     @Test
+    @MediumTest
     public void testPrefsInitialization() throws Exception {
         assertNotNull(mPreferences);
     }
 
     @Test
+    @MediumTest
     public void testString() throws Exception{
         String key = "string_key";
         String data = UUID.randomUUID().toString();
@@ -51,7 +59,7 @@ public class SecurePreferencesTest {
         assertEquals(retData, data);
     }
 
-    @Test
+    @MediumTest
     public void testInt() throws Exception{
         String key = "int_key";
         int data = new SecureRandom().nextInt();
@@ -62,7 +70,7 @@ public class SecurePreferencesTest {
         assertEquals(retData, data);
     }
 
-    @Test
+    @MediumTest
     public void testLong() throws Exception{
         String key = "long_key";
         long data = new SecureRandom().nextLong();
@@ -73,7 +81,7 @@ public class SecurePreferencesTest {
         assertEquals(retData, data);
     }
 
-    @Test
+    @MediumTest
     public void testFloat() throws Exception{
         String key = "float_key";
         float data = new SecureRandom().nextFloat();
@@ -84,7 +92,7 @@ public class SecurePreferencesTest {
         assertEquals(retData, data, 0.0001F);
     }
 
-    @Test
+    @MediumTest
     public void testBoolean() throws Exception{
         String key = "boolean_key";
         boolean data = (new SecureRandom().nextDouble() > 0.5);
@@ -95,7 +103,7 @@ public class SecurePreferencesTest {
         assertEquals(retData, data);
     }
 
-    @Test
+    @MediumTest
     public void testStringSet() throws Exception{
         Set<String> mSet = new HashSet<>();
         String key = "set_key";

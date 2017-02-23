@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences.security;
+package iq.qicard.hussain.securepreferences.crypto;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -11,8 +11,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import iq.qicard.hussain.securepreferences.util.ByteUtils;
-
 public class CipherAES{
 
     /* Encryption Variables */
@@ -21,17 +19,10 @@ public class CipherAES{
     private static final String PADDING_TYPE = "PKCS5Padding";
     private static final String ENCRYPTION_MODE;
 
+    private static final Cipher mCipher;
+
     static {
         ENCRYPTION_MODE = ENCRYPTION_ALGORITHM + "/" + BLOCK_OPERATION_MODE + "/" + PADDING_TYPE;
-    }
-
-    private final Cipher mCipher;
-    private byte[] mKeyBytes;
-    private byte[] mIvBytes;
-
-    public CipherAES(char[] key, byte[] iv){
-        convertSecretToBytes(key);
-        this.mIvBytes = iv;
         try{
             mCipher = Cipher.getInstance(ENCRYPTION_MODE);
         }catch(NoSuchAlgorithmException | NoSuchPaddingException e){
@@ -39,12 +30,12 @@ public class CipherAES{
         }
     }
 
-    public byte[] encrypt(byte[] data){
+    public static byte[] encrypt(byte[] mKeyBytes, byte[] iv, byte[] data){
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.ENCRYPT_MODE,
-                        generateSecretKeySpec(CipherSHA.hashUsingSHA256(mKeyBytes)),
-                        generateIvParameterSpec());
+                        generateSecretKeySpec(mKeyBytes),
+                        generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
             }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
                 throw new IllegalStateException(e.getMessage());
@@ -52,12 +43,12 @@ public class CipherAES{
         }
     }
 
-    public byte[] decrypt(byte[] data){
+    public static byte[] decrypt(byte[] mKeyBytes, byte[] iv, byte[] data){
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.DECRYPT_MODE,
-                        generateSecretKeySpec(CipherSHA.hashUsingSHA256(mKeyBytes)),
-                        generateIvParameterSpec());
+                        generateSecretKeySpec(mKeyBytes),
+                        generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
             }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
                 throw new IllegalStateException(e.getMessage());
@@ -65,15 +56,11 @@ public class CipherAES{
         }
     }
 
-    private SecretKeySpec generateSecretKeySpec(byte[] key){
+    private static SecretKeySpec generateSecretKeySpec(byte[] key){
         return new SecretKeySpec(key, ENCRYPTION_ALGORITHM);
     }
 
-    private IvParameterSpec generateIvParameterSpec(){
-        return new IvParameterSpec(mIvBytes);
-    }
-
-    private void convertSecretToBytes(char[] secret){
-        mKeyBytes = ByteUtils.convertCharsToBytes(secret);
+    private static IvParameterSpec generateIvParameterSpec(byte[] iv){
+        return new IvParameterSpec(iv);
     }
 }

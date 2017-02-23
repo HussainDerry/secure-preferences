@@ -2,7 +2,7 @@
  * Copyright (c) Hussain Yahia Al-Derry 2016. All Rights Reserved.
  */
 
-package iq.qicard.hussain.securepreferences.security;
+package iq.qicard.hussain.securepreferences.crypto;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
