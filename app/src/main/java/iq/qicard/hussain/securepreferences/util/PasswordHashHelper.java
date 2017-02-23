@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences.crypto;
+package iq.qicard.hussain.securepreferences.util;
 
 import java.security.SecureRandom;
 
@@ -14,17 +14,17 @@ import java.security.spec.InvalidKeySpecException;
  * Author: havoc AT defuse.ca
  * www: http://crackstation.net/hashing-security.htm
  */
-public class PasswordHash {
-    public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA512";
+public class PasswordHashHelper {
+    private static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
 
     // The following constants may be changed without breaking existing hashes.
-    public static final int SALT_BYTES = 64;
-    public static final int HASH_BYTES = 64;
-    public static final int PBKDF2_ITERATIONS = 1000;
+    private static final int SALT_BYTES = 32;
+    private static final int HASH_BYTES = 32;
+    private static final int PBKDF2_ITERATIONS = 65536;
 
-    public static final int ITERATION_INDEX = 0;
-    public static final int SALT_INDEX = 1;
-    public static final int PBKDF2_INDEX = 2;
+    private static final int ITERATION_INDEX = 0;
+    private static final int SALT_INDEX = 1;
+    private static final int PBKDF2_INDEX = 2;
 
     /**
      * Returns a salted PBKDF2 hash of the password.
@@ -111,7 +111,7 @@ public class PasswordHash {
      * @param bytes      the length of the hash to compute in bytes
      * @return the PBDKF2 hash of the password
      */
-    private static byte[] pbkdf2(char[] password, byte[] salt, int iterations, int bytes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static byte[] pbkdf2(char[] password, byte[] salt, int iterations, int bytes) throws NoSuchAlgorithmException, InvalidKeySpecException {
         PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, bytes * 8);
         SecretKeyFactory skf = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM);
         return skf.generateSecret(spec).getEncoded();
@@ -148,7 +148,7 @@ public class PasswordHash {
     }
 
     /**
-     * Tests the basic functionality of the PasswordHash class
+     * Tests the basic functionality of the PasswordHashHelper class
      *
      * @param args ignored
      */
@@ -156,7 +156,7 @@ public class PasswordHash {
         try {
             // Print out 10 hashes
             for (int i = 0; i < 10; i++)
-                System.out.println(PasswordHash.createHash("p\r\nassw0Rd!"));
+                System.out.println(PasswordHashHelper.createHash("p\r\nassw0Rd!"));
 
             // Test password validation
             boolean failure = false;

@@ -23,11 +23,7 @@ public class SecurePreferences implements SharedPreferences{
     }
 
     private SecurePreferences(Context context, String fileName, String password) {
-        try {
-            this.mCryptor = new CryptorAES(CipherSHA.hashUsingSHA256(password.getBytes(CHARSET)));
-        } catch (UnsupportedEncodingException e) {
-           throw new RuntimeException("UTF-8 Unsupported!");
-        }
+        this.mCryptor = new CryptorAES(password.toCharArray());
         this.mProxyPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 

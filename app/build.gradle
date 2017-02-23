@@ -1,4 +1,4 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
@@ -6,7 +6,7 @@ android {
     buildToolsVersion "24.0.2"
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 11
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -31,8 +31,6 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    androidTestCompile 'junit:junit:' + rootProject.junitVersion;
-    androidTestCompile 'org.mockito:mockito-core:' + rootProject.mockitoVersion;
-
+    testCompile 'junit:junit:' + rootProject.junitVersion;
     compile group: 'com.madgag.spongycastle', name: 'core', version: '1.54.0.0'
 }
