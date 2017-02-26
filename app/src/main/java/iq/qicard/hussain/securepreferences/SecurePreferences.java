@@ -11,19 +11,25 @@ import java.util.Set;
 
 import iq.qicard.hussain.securepreferences.crypto.CipherSHA;
 import iq.qicard.hussain.securepreferences.crypto.CryptorAES;
+import iq.qicard.hussain.securepreferences.model.DefaultSecurityConfig;
+import iq.qicard.hussain.securepreferences.model.SecurityConfig;
 
-public class SecurePreferences implements SharedPreferences{
+public final class SecurePreferences implements SharedPreferences{
 
     private static final String CHARSET = "UTF-8";
     private final CryptorAES mCryptor;
     private SharedPreferences mProxyPreferences;
 
     public static SecurePreferences getInstance(Context context, String filename, String password){
-        return new SecurePreferences(context.getApplicationContext(), filename, password);
+        return new SecurePreferences(context.getApplicationContext(), filename, new DefaultSecurityConfig(password.toCharArray()));
     }
 
-    private SecurePreferences(Context context, String fileName, String password) {
-        this.mCryptor = new CryptorAES(password.toCharArray());
+    public static SecurePreferences getInstance(Context context, String filename, SecurityConfig securityConfig){
+        return new SecurePreferences(context.getApplicationContext(), filename, securityConfig);
+    }
+
+    private SecurePreferences(Context context, String fileName, SecurityConfig securityConfig) {
+        this.mCryptor = new CryptorAES(securityConfig);
         this.mProxyPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 
@@ -123,7 +129,7 @@ public class SecurePreferences implements SharedPreferences{
         mProxyPreferences.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
     }
 
-    public class Editor implements SharedPreferences.Editor{
+    public final class Editor implements SharedPreferences.Editor{
 
         protected SharedPreferences.Editor mProxyEditor;
 

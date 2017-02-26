@@ -2,43 +2,45 @@ package iq.qicard.hussain.securepreferences.crypto;
 
 import android.util.Base64;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 
+import iq.qicard.hussain.securepreferences.model.SecurityConfig;
 import iq.qicard.hussain.securepreferences.util.PasswordHashHelper;
 
-public class CryptorAES {
+public final class CryptorAES {
 
-    private static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
-    private static final int PBKDF2_ITERATIONS = 65536;
-    private static final int PBKDF2_HASH_SIZE_BYTES = 32;
-    private static final int PBKDF2_SALT_SIZE_BYTES = 32;
+    private static final int AES_KEY_SIZE = 256;
+    private static final int AES_IV_SIZE = 16;
 
     private static final int INDEX_SALT = 0;
     private static final int INDEX_IV = 1;
     private static final int INDEX_CIPHER_TEXT = 2;
 
     private static final String SPLITTER = "\\.";
-    private char[] mSekrt;
+    private final SecurityConfig mSecurityConfig;
 
-    public CryptorAES(char[] secretKey){
-        mSekrt = Arrays.copyOf(secretKey, secretKey.length);
+    public CryptorAES(SecurityConfig securityConfig){
+        this.mSecurityConfig = securityConfig;
     }
 
     public synchronized String encryptToBase64(byte[] data){
         // Generating Random IV
         SecureRandom mRandom = new SecureRandom();
-        byte[] iv = new byte[16];
+        byte[] iv = new byte[AES_IV_SIZE];
         mRandom.nextBytes(iv);
 
         // Generating Salt
-        byte[] salt = new byte[PBKDF2_SALT_SIZE_BYTES];
+        byte[] salt = new byte[mSecurityConfig.getSaltSize()];
         mRandom.nextBytes(salt);
 
-        byte[] encrypted = CipherAES.encrypt(generateSecretKey(mSekrt, salt), iv, data);
-        return toBase64(salt) + SPLITTER + toBase64(iv) + SPLITTER + toBase64(encrypted);
+        byte[] encrypted = CipherAES.encrypt(generateSecretKey(mSecurityConfig.getPassword(), salt), iv, data);
+        return new StringBuilder()
+                .append(toBase64(salt))
+                .append(".")
+                .append(toBase64(iv))
+                .append(".")
+                .append(toBase64(encrypted))
+                .toString();
     }
 
     public synchronized byte[] decryptFromBase64(String encryptedBase64){
@@ -47,23 +49,40 @@ public class CryptorAES {
         byte[] iv = fromBase64(parts[INDEX_IV]);
         byte[] cipherText = fromBase64(parts[INDEX_CIPHER_TEXT]);
 
-        return CipherAES.decrypt(generateSecretKey(mSekrt, salt), iv, cipherText);
+        return CipherAES.decrypt(generateSecretKey(mSecurityConfig.getPassword(), salt), iv, cipherText);
     }
 
     private byte[] generateSecretKey(char[] password, byte[] salt){
-        try{
-            return PasswordHashHelper.pbkdf2(password, salt, PBKDF2_ITERATIONS, PBKDF2_HASH_SIZE_BYTES);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new RuntimeException(e.getMessage());
+        switch(mSecurityConfig.getDigestType()){
+
+            case SHA1:{
+                return PasswordHashHelper.hashUsingPBKDF2WithSHA1(password, salt,
+                        mSecurityConfig.getPBKDF2Iterations(), AES_KEY_SIZE);
+            }
+
+            case SHA256:{
+                return PasswordHashHelper.hashUsingPBKDF2WithSHA256(password, salt,
+                        mSecurityConfig.getPBKDF2Iterations(), AES_KEY_SIZE);
+            }
+
+            case SHA512:{
+                return PasswordHashHelper.hashUsingPBKDF2WithSHA512(password, salt,
+                        mSecurityConfig.getPBKDF2Iterations(), AES_KEY_SIZE);
+            }
+
+            default:{
+                throw new IllegalStateException("Unknown Digest Type!");
+            }
+
         }
     }
 
     private String toBase64(byte[] data){
-        return Base64.encodeToString(data, Base64.DEFAULT);
+        return Base64.encodeToString(data, Base64.NO_WRAP);
     }
 
     private byte[] fromBase64(String base64){
-        return Base64.decode(base64, Base64.DEFAULT);
+        return Base64.decode(base64, Base64.NO_WRAP);
     }
 
 }

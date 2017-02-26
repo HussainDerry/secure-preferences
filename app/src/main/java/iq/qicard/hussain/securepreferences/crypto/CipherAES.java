@@ -30,7 +30,7 @@ public class CipherAES{
         }
     }
 
-    public static byte[] encrypt(byte[] mKeyBytes, byte[] iv, byte[] data){
+    static byte[] encrypt(byte[] mKeyBytes, byte[] iv, byte[] data){
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.ENCRYPT_MODE,
@@ -43,7 +43,7 @@ public class CipherAES{
         }
     }
 
-    public static byte[] decrypt(byte[] mKeyBytes, byte[] iv, byte[] data){
+    static byte[] decrypt(byte[] mKeyBytes, byte[] iv, byte[] data){
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.DECRYPT_MODE,
