@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import iq.qicard.hussain.securepreferences.crypto.CipherSHA;
-import iq.qicard.hussain.securepreferences.crypto.CryptorAES;
+import iq.qicard.hussain.securepreferences.crypto.Cryptor;
 import iq.qicard.hussain.securepreferences.model.DefaultSecurityConfig;
 import iq.qicard.hussain.securepreferences.model.SecurityConfig;
 
@@ -21,7 +21,7 @@ import iq.qicard.hussain.securepreferences.model.SecurityConfig;
 public final class SecurePreferences implements SharedPreferences{
 
     private static final String CHARSET = "UTF-8";
-    private final CryptorAES mCryptor;
+    private final Cryptor mCryptor;
     private SharedPreferences mProxyPreferences;
 
     public static SecurePreferences getInstance(Context context, String filename, String password){
@@ -33,7 +33,7 @@ public final class SecurePreferences implements SharedPreferences{
     }
 
     private SecurePreferences(Context context, String fileName, SecurityConfig securityConfig) {
-        this.mCryptor = CryptorAES.initWithSecurityConfigurations(securityConfig);
+        this.mCryptor = Cryptor.initWithSecurityConfigurations(securityConfig);
         this.mProxyPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 

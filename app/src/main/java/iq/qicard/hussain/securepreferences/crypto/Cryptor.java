@@ -2,6 +2,13 @@ package iq.qicard.hussain.securepreferences.crypto;
 
 import android.util.Base64;
 
+import org.spongycastle.crypto.PBEParametersGenerator;
+import org.spongycastle.crypto.digests.SHA1Digest;
+import org.spongycastle.crypto.digests.SHA256Digest;
+import org.spongycastle.crypto.digests.SHA512Digest;
+import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.spongycastle.crypto.params.KeyParameter;
+
 import java.security.SecureRandom;
 
 import iq.qicard.hussain.securepreferences.model.SecurityConfig;
@@ -10,13 +17,13 @@ import iq.qicard.hussain.securepreferences.model.SecurityConfig;
  * @author Hussain Al-Derry
  * @version 1.0
  * */
-public final class CryptorAES {
+public final class Cryptor {
 
     /* AES configurations */
     private static final int AES_KEY_SIZE = 256;
     private static final int AES_IV_SIZE = 16;
 
-    /* Indexes used for parsing the stored Base64 */
+    /* Variables used for parsing the stored Base64 */
     private static final String SPLITTER = "\\.";
     private static final int INDEX_SALT = 0;
     private static final int INDEX_IV = 1;
@@ -29,11 +36,11 @@ public final class CryptorAES {
      * Initializes the Cryptor with the provided {@link SecurityConfig}
      * @param config The security configurations to use
      * */
-    public static CryptorAES initWithSecurityConfigurations(SecurityConfig config){
-        return new CryptorAES(config);
+    public static Cryptor initWithSecurityConfigurations(SecurityConfig config){
+        return new Cryptor(config);
     }
 
-    private CryptorAES(SecurityConfig securityConfig){
+    private Cryptor(SecurityConfig securityConfig){
         this.mSecurityConfig = securityConfig;
     }
 
@@ -53,7 +60,7 @@ public final class CryptorAES {
         byte[] salt = new byte[mSecurityConfig.getSaltSize()];
         mRandom.nextBytes(salt);
 
-        byte[] encrypted = CipherAES.encrypt(generateSecretKey(mSecurityConfig.getPassword(), salt), iv, data);
+        byte[] encrypted = CipherAES.encrypt(pbkdf2(salt), iv, data);
         return new StringBuilder()
                 .append(toBase64(salt))
                 .append(".")
@@ -79,39 +86,43 @@ public final class CryptorAES {
         byte[] iv = fromBase64(parts[INDEX_IV]);
         byte[] cipherText = fromBase64(parts[INDEX_CIPHER_TEXT]);
 
-        return CipherAES.decrypt(generateSecretKey(mSecurityConfig.getPassword(), salt), iv, cipherText);
+        return CipherAES.decrypt(pbkdf2(salt), iv, cipherText);
     }
 
     /**
-     * Generates an encryption key for AES based on the input and the security configurations.
+     * Generates PBKDF2 hash for the configured password using the provided salt
      *
-     * @param password The base password to derive from.
-     * @param salt The salt to use for the
-     * @return The encryption key to use for AES as byte array.
+     * @param salt The salt to use.
+     * @return The password hash as byte array
      * */
-    private byte[] generateSecretKey(char[] password, byte[] salt){
-        switch(mSecurityConfig.getDigestType()){
+    private byte[] pbkdf2(byte[] salt){
+        byte[] passwordBytes = PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(mSecurityConfig.getPassword());
+        PKCS5S2ParametersGenerator mGenerator;
+        switch (mSecurityConfig.getDigestType()){
 
             case SHA1:{
-                return PBKDF2Helper.hashUsingPBKDF2WithSHA1(password, salt,
-                        mSecurityConfig.getPBKDF2Iterations(), AES_KEY_SIZE);
+                mGenerator = new PKCS5S2ParametersGenerator(new SHA1Digest());
+                break;
             }
 
             case SHA256:{
-                return PBKDF2Helper.hashUsingPBKDF2WithSHA256(password, salt,
-                        mSecurityConfig.getPBKDF2Iterations(), AES_KEY_SIZE);
+                mGenerator = new PKCS5S2ParametersGenerator(new SHA256Digest());
+                break;
             }
 
             case SHA512:{
-                return PBKDF2Helper.hashUsingPBKDF2WithSHA512(password, salt,
-                        mSecurityConfig.getPBKDF2Iterations(), AES_KEY_SIZE);
+                mGenerator = new PKCS5S2ParametersGenerator(new SHA512Digest());
+                break;
             }
 
             default:{
-                throw new IllegalStateException("Unknown Digest Type!");
+                throw new IllegalStateException("Unknown Digest!");
             }
 
         }
+
+        mGenerator.init(passwordBytes, salt, mSecurityConfig.getPBKDF2Iterations());
+        return ((KeyParameter) mGenerator.generateDerivedParameters(AES_KEY_SIZE)).getKey();
     }
 
     private String toBase64(byte[] data){
