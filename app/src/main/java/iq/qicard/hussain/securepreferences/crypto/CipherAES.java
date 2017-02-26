@@ -11,7 +11,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class CipherAES{
+/**
+ * Abstraction of the AES encryption
+ * @author Hussain Al-Derry <hussain.derry@gmail.com>
+ * @version 1.0
+ * */
+final class CipherAES{
 
     /* Encryption Variables */
     private static final String ENCRYPTION_ALGORITHM = "AES";

@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences.util;
+package iq.qicard.hussain.securepreferences.crypto;
 
 import org.spongycastle.crypto.PBEParametersGenerator;
 import org.spongycastle.crypto.digests.SHA1Digest;
@@ -12,9 +12,8 @@ import org.spongycastle.crypto.params.KeyParameter;
  *
  * @author Hussain Al-Derry
  * @version 0.1
- * @since 2/26/17
  */
-public class PasswordHashHelper {
+public class PBKDF2Helper {
 
     /**
      * Computes the PBKDF2 hash of a password with SHA1 HMAC.

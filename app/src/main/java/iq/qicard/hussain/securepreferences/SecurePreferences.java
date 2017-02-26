@@ -14,6 +14,10 @@ import iq.qicard.hussain.securepreferences.crypto.CryptorAES;
 import iq.qicard.hussain.securepreferences.model.DefaultSecurityConfig;
 import iq.qicard.hussain.securepreferences.model.SecurityConfig;
 
+/**
+ * @author Hussain Al-Derry <hussain.derry@gmail.com>
+ * @version 1.0
+ * */
 public final class SecurePreferences implements SharedPreferences{
 
     private static final String CHARSET = "UTF-8";
@@ -29,7 +33,7 @@ public final class SecurePreferences implements SharedPreferences{
     }
 
     private SecurePreferences(Context context, String fileName, SecurityConfig securityConfig) {
-        this.mCryptor = new CryptorAES(securityConfig);
+        this.mCryptor = CryptorAES.initWithSecurityConfigurations(securityConfig);
         this.mProxyPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 

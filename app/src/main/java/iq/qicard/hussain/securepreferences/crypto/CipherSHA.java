@@ -12,9 +12,7 @@ import java.security.NoSuchAlgorithmException;
  * @author Hussain Al-Derry
  * @version 0.1
  * */
-public class CipherSHA {
-
-    private static final String CHARSET = "UTF-8";
+public final class CipherSHA {
 
     /**
      * Hashes a given String using the SHA-256
