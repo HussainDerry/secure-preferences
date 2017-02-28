@@ -1,8 +1,4 @@
-/*
- * Copyright (c) Hussain Yahia Al-Derry 2016. All Rights Reserved.
- */
-
-package iq.qicard.hussain.securepreferences.crypto;
+package com.gmail.derry.hussain.securepreferences.crypto;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

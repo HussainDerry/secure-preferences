@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences.crypto;
+package com.gmail.derry.hussain.securepreferences.crypto;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -31,7 +31,7 @@ final class CipherAES{
         try{
             mCipher = Cipher.getInstance(ENCRYPTION_MODE);
         }catch(NoSuchAlgorithmException | NoSuchPaddingException e){
-            throw new IllegalStateException("Unable to initialize cipher");
+            throw new IllegalStateException("Unable to initialize cipher, mode might not be supported");
         }
     }
 

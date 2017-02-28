@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences;
+package com.gmail.derry.hussain.securepreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,10 +9,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import iq.qicard.hussain.securepreferences.crypto.CipherSHA;
-import iq.qicard.hussain.securepreferences.crypto.Cryptor;
-import iq.qicard.hussain.securepreferences.model.DefaultSecurityConfig;
-import iq.qicard.hussain.securepreferences.model.SecurityConfig;
+import com.gmail.derry.hussain.securepreferences.crypto.CipherSHA;
+import com.gmail.derry.hussain.securepreferences.crypto.Cryptor;
+import com.gmail.derry.hussain.securepreferences.model.DefaultSecurityConfig;
+import com.gmail.derry.hussain.securepreferences.model.SecurityConfig;
 
 /**
  * @author Hussain Al-Derry <hussain.derry@gmail.com>

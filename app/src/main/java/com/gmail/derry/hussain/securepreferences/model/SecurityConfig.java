@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences.model;
+package com.gmail.derry.hussain.securepreferences.model;
 
 import java.util.Arrays;
 

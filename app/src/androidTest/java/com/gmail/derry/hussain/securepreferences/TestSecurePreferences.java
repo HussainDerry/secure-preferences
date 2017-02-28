@@ -1,13 +1,9 @@
-package iq.qicard.hussain.securepreferences;
+package com.gmail.derry.hussain.securepreferences;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.core.deps.guava.primitives.Booleans;
-import android.support.test.filters.MediumTest;
-import android.support.test.filters.SmallTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;

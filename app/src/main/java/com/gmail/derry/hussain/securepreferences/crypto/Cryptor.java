@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences.crypto;
+package com.gmail.derry.hussain.securepreferences.crypto;
 
 import android.util.Base64;
 
@@ -11,7 +11,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.security.SecureRandom;
 
-import iq.qicard.hussain.securepreferences.model.SecurityConfig;
+import com.gmail.derry.hussain.securepreferences.model.SecurityConfig;
 
 /**
  * @author Hussain Al-Derry

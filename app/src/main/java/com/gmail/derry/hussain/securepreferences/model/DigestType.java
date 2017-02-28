@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences.model;
+package com.gmail.derry.hussain.securepreferences.model;
 
 /**
  * Types of digests that can be used with PBKDF2

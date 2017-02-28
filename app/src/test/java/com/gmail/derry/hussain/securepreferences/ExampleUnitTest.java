@@ -1,4 +1,4 @@
-package iq.qicard.hussain.securepreferences;
+package com.gmail.derry.hussain.securepreferences;
 
 import org.junit.Test;
 
