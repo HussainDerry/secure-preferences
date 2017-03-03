@@ -6,20 +6,32 @@ Library that provides an AES-256 encrypted version of the Android shared prefere
 
 #### Gradle
 
-`compile 'com.github.hussainderry'`
+`compile 'com.github.hussainderry:secure-preferences:0.0.1'`
 
 #### Maven
 ```
 <dependency>
     <groupId>com.github.hussainderry</groupId>
-    <artifactId>-</artifactId>
+    <artifactId>secure-preferences</artifactId>
     <version>0.0.1</version>
 </dependency>
 ```
 
 ## Sample Usage
 ```java
-Code goes here
+// initializing with minimum configurations
+SecurePreferences mPreferences = SecurePreferences.getInstance(MainActivity.this, "myfile", "pa$$word");
+SecurePreferences.Editor mEditor = mPreferences.edit();
+
+// initializing with full security configurations
+char[] password = "pa$$word".toCharArray();
+int pbkdf2_iterations = 25000;
+int pbkdf2_salt_size = 32;
+DigestType digestType = DigestType.SHA256;
+SecurityConfig mConfig = new SecurityConfig(password, pbkdf2_iterations, pbkdf2_salt_size, digestType);
+
+SecurePreferences mPreferences = SecurePreferences.getInstance(MainActivity.this, "myfile", mConfig);
+SecurePreferences.Editor mEditor = mPreferences.edit();
 ```
 
 ## Developed By
