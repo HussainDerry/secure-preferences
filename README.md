@@ -43,7 +43,7 @@ SecurePreferences.Editor mEditor = mPreferences.edit();
 ## License
 
 ```
-Copyright 2015 Etienne Lawlor
+Copyright 2015 Hussain Al-Derry
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
