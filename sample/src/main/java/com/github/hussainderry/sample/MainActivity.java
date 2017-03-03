@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.github.hussainderry.securepreferences.SecurePreferences;
+import com.github.hussainderry.securepreferences.model.DigestType;
+import com.github.hussainderry.securepreferences.model.SecurityConfig;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,7 +25,18 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mPreferences = SecurePreferences.getInstance(MainActivity.this, FILENAME, PASSWORD);
+        // Minimum Configurations
+        SecurityConfig minimumConfig = new SecurityConfig.Builder(PASSWORD)
+                .build();
+
+        // Full Configurations
+        SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD)
+                .setPbkdf2SaltSize(32)
+                .setPbkdf2Iterations(24000)
+                .setDigestType(DigestType.SHA256)
+                .build();
+
+        mPreferences = SecurePreferences.getInstance(MainActivity.this, FILENAME, minimumConfig);
         mEditor = mPreferences.edit();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

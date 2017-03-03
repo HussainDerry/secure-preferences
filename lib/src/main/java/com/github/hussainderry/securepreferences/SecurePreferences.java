@@ -4,15 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 
+import com.github.hussainderry.securepreferences.crypto.Cryptor;
+import com.github.hussainderry.securepreferences.crypto.HashSHA;
+import com.github.hussainderry.securepreferences.model.SecurityConfig;
+
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.github.hussainderry.securepreferences.crypto.HashSHA;
-import com.github.hussainderry.securepreferences.crypto.Cryptor;
-import com.github.hussainderry.securepreferences.model.DefaultSecurityConfig;
-import com.github.hussainderry.securepreferences.model.SecurityConfig;
 
 /**
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
@@ -23,17 +22,6 @@ public final class SecurePreferences implements SharedPreferences{
     private static final String CHARSET = "UTF-8";
     private final Cryptor mCryptor;
     private SharedPreferences mProxyPreferences;
-
-    /**
-     * Creates an instance of the preferences using the provided password with the default security configurations.
-     * @param context The context to be used to create the instance
-     * @param filename The preferences filename
-     * @param password The base password to be used for encryption
-     * @return The SecurePreferences instance
-     * */
-    public static SecurePreferences getInstance(Context context, String filename, String password){
-        return new SecurePreferences(context.getApplicationContext(), filename, new DefaultSecurityConfig(password.toCharArray()));
-    }
 
     /**
      * Creates an instance of the preferences using the provided security configurations.

@@ -8,29 +8,20 @@ Library that provides an AES-256 encrypted version of the Android shared prefere
 
 `compile 'com.github.hussainderry:secure-preferences:0.0.1'`
 
-#### Maven
-```
-<dependency>
-    <groupId>com.github.hussainderry</groupId>
-    <artifactId>secure-preferences</artifactId>
-    <version>0.0.1</version>
-</dependency>
-```
-
 ## Sample Usage
 ```java
-// initializing with minimum configurations
-SecurePreferences mPreferences = SecurePreferences.getInstance(MainActivity.this, "myfile", "pa$$word");
-SecurePreferences.Editor mEditor = mPreferences.edit();
+// Minimum Configurations
+SecurityConfig minimumConfig = new SecurityConfig.Builder(PASSWORD)
+        .build();
 
-// initializing with full security configurations
-char[] password = "pa$$word".toCharArray();
-int pbkdf2_iterations = 25000;
-int pbkdf2_salt_size = 32;
-DigestType digestType = DigestType.SHA256;
-SecurityConfig mConfig = new SecurityConfig(password, pbkdf2_iterations, pbkdf2_salt_size, digestType);
+// Full Configurations
+SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD)
+        .setPbkdf2SaltSize(32)
+        .setPbkdf2Iterations(24000)
+        .setDigestType(DigestType.SHA256)
+        .build();
 
-SecurePreferences mPreferences = SecurePreferences.getInstance(MainActivity.this, "myfile", mConfig);
+SecurePreferences mPreferences = SecurePreferences.getInstance(MainActivity.this, FILENAME, minimumConfig);
 SecurePreferences.Editor mEditor = mPreferences.edit();
 ```
 
@@ -43,7 +34,7 @@ SecurePreferences.Editor mEditor = mPreferences.edit();
 ## License
 
 ```
-Copyright 2015 Hussain Al-Derry
+Copyright 2017 Hussain Al-Derry
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

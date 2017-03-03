@@ -42,4 +42,43 @@ public class SecurityConfig {
     public int getSaltSize() {
         return iSaltSize;
     }
+
+    public static class Builder{
+
+        private static final int DEFAULT_ITERATIONS = 10000;
+        private static final int DEFAULT_SALT_SIZE = 64;
+        private static final DigestType DEFAULT_DIGEST = DigestType.SHA256;
+
+        private char[] password;
+        private int saltSize = -1;
+        private int iterations = -1;
+        private DigestType digest = null;
+
+        public Builder(String password){
+            this.password = password.toCharArray();
+        }
+
+        public Builder setPbkdf2Iterations(int iterations){
+            this.iterations = iterations;
+            return this;
+        }
+
+        public Builder setPbkdf2SaltSize(int saltSize){
+            this.saltSize = saltSize;
+            return this;
+        }
+
+        public Builder setDigestType(DigestType digestType){
+            this.digest = digestType;
+            return this;
+        }
+
+        public SecurityConfig build(){
+            int finalIterations = iterations != -1 ? iterations : DEFAULT_ITERATIONS;
+            int finalSaltSize = saltSize != -1 ? saltSize : DEFAULT_SALT_SIZE;
+            DigestType finalDigest = digest != null ? digest : DEFAULT_DIGEST;
+
+            return new SecurityConfig(password, finalIterations, finalSaltSize, finalDigest);
+        }
+    }
 }
