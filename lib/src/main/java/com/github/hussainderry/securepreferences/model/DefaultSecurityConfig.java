@@ -3,9 +3,8 @@ package com.github.hussainderry.securepreferences.model;
 /**
  * Configure security params with the default values.
  *
- * @author Hussain Al-Derry
- * @version 0.1
- * @since 2/26/17
+ * @author Hussain Al-Derry <hussain.derry@gmail.com>
+ * @version 1.0
  */
 public class DefaultSecurityConfig extends SecurityConfig{
 

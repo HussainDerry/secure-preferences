@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.hussainderry.securepreferences.crypto.CipherSHA;
+import com.github.hussainderry.securepreferences.crypto.HashSHA;
 import com.github.hussainderry.securepreferences.crypto.Cryptor;
 import com.github.hussainderry.securepreferences.model.DefaultSecurityConfig;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
@@ -24,22 +24,36 @@ public final class SecurePreferences implements SharedPreferences{
     private final Cryptor mCryptor;
     private SharedPreferences mProxyPreferences;
 
+    /**
+     * Creates an instance of the preferences using the provided password with the default security configurations.
+     * @param context The context to be used to create the instance
+     * @param filename The preferences filename
+     * @param password The base password to be used for encryption
+     * @return The SecurePreferences instance
+     * */
     public static SecurePreferences getInstance(Context context, String filename, String password){
         return new SecurePreferences(context.getApplicationContext(), filename, new DefaultSecurityConfig(password.toCharArray()));
     }
 
+    /**
+     * Creates an instance of the preferences using the provided security configurations.
+     * @param context The context to be used to create the instance
+     * @param filename The preferences filename
+     * @param securityConfig The security configurations to use
+     * @return The SecurePreferences instance
+     * */
     public static SecurePreferences getInstance(Context context, String filename, SecurityConfig securityConfig){
         return new SecurePreferences(context.getApplicationContext(), filename, securityConfig);
     }
 
     private SecurePreferences(Context context, String fileName, SecurityConfig securityConfig) {
-        this.mCryptor = Cryptor.initWithSecurityConfigurations(securityConfig);
+        this.mCryptor = Cryptor.initWithSecurityConfig(securityConfig);
         this.mProxyPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 
     private String generateKeyHash(String key){
         try{
-            byte[] mBytes = CipherSHA.hashUsingSHA256(key.getBytes(CHARSET));
+            byte[] mBytes = HashSHA.hashUsingSHA256(key.getBytes(CHARSET));
             return new String(Base64.encode(mBytes, Base64.DEFAULT), CHARSET);
         }catch(UnsupportedEncodingException e){
             throw new IllegalStateException(e.getMessage());

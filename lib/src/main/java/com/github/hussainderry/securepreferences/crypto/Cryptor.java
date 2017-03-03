@@ -14,7 +14,7 @@ import java.security.SecureRandom;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
 
 /**
- * @author Hussain Al-Derry
+ * @author Hussain Al-Derry <hussain.derry@gmail.com>
  * @version 1.0
  * */
 public final class Cryptor {
@@ -36,7 +36,7 @@ public final class Cryptor {
      * Initializes the Cryptor with the provided {@link SecurityConfig}
      * @param config The security configurations to use
      * */
-    public static Cryptor initWithSecurityConfigurations(SecurityConfig config){
+    public static Cryptor initWithSecurityConfig(SecurityConfig config){
         return new Cryptor(config);
     }
 

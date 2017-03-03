@@ -4,14 +4,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Provides a repo of hash functions, returns the hashed String in Base64 encoding.
- * @author Hussain Al-Derry
+ * @author Hussain Al-Derry <hussain.derry@gmail.com>
  * @version 0.1
  * */
-public final class CipherSHA {
+public class HashSHA {
 
     /**
-     * Hashes a given String using the SHA-256
+     * Hashes the given data using SHA-256
      * @param data the byte data to be hashed
      * @return hashed byte array containing the hash
      * */
@@ -25,7 +24,7 @@ public final class CipherSHA {
     }
 
     /**
-     * Hashes a given String using the SHA-512
+     * Hashes the given data using SHA-512
      * @param data the byte data to be hashed
      * @return hashed byte array containing the hash
      * */

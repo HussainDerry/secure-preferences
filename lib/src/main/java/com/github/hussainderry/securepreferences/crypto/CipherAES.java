@@ -12,7 +12,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Abstraction of the AES encryption
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
  * @version 1.0
  * */
@@ -35,11 +34,11 @@ final class CipherAES{
         }
     }
 
-    static byte[] encrypt(byte[] mKeyBytes, byte[] iv, byte[] data){
+    static byte[] encrypt(byte[] key, byte[] iv, byte[] data){
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.ENCRYPT_MODE,
-                        generateSecretKeySpec(mKeyBytes),
+                        generateSecretKeySpec(key),
                         generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
             }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
@@ -48,11 +47,11 @@ final class CipherAES{
         }
     }
 
-    static byte[] decrypt(byte[] mKeyBytes, byte[] iv, byte[] data){
+    static byte[] decrypt(byte[] key, byte[] iv, byte[] data){
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.DECRYPT_MODE,
-                        generateSecretKeySpec(mKeyBytes),
+                        generateSecretKeySpec(key),
                         generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
             }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
