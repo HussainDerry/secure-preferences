@@ -1,6 +1,6 @@
 ## Overview
 
-Library that provides an AES-256 encrypted version of the Android shared preferences
+A simple library that provides an AES-256 encrypted version of the Android shared preferences
 
 ## Setup
 
