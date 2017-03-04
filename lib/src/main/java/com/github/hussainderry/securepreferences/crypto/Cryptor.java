@@ -2,6 +2,8 @@ package com.github.hussainderry.securepreferences.crypto;
 
 import android.util.Base64;
 
+import com.github.hussainderry.securepreferences.model.SecurityConfig;
+
 import org.spongycastle.crypto.PBEParametersGenerator;
 import org.spongycastle.crypto.digests.SHA1Digest;
 import org.spongycastle.crypto.digests.SHA256Digest;
@@ -11,8 +13,6 @@ import org.spongycastle.crypto.params.KeyParameter;
 
 import java.security.SecureRandom;
 
-import com.github.hussainderry.securepreferences.model.SecurityConfig;
-
 /**
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
  * @version 1.0
@@ -20,7 +20,6 @@ import com.github.hussainderry.securepreferences.model.SecurityConfig;
 public final class Cryptor {
 
     /* AES configurations */
-    private static final int AES_KEY_SIZE = 256;
     private static final int AES_IV_SIZE = 16;
 
     /* Variables used for parsing the stored Base64 */
@@ -122,7 +121,7 @@ public final class Cryptor {
         }
 
         mGenerator.init(passwordBytes, salt, mSecurityConfig.getPBKDF2Iterations());
-        return ((KeyParameter) mGenerator.generateDerivedParameters(AES_KEY_SIZE)).getKey();
+        return ((KeyParameter) mGenerator.generateDerivedParameters(mSecurityConfig.getAesKeySize())).getKey();
     }
 
     private String toBase64(byte[] data){
