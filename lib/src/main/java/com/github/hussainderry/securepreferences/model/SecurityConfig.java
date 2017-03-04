@@ -71,11 +71,19 @@ public class SecurityConfig {
             this.password = password.toCharArray();
         }
 
+        /**
+         * Set the PBKDF2 iterations
+         * @param iterations The number of iterations
+         * */
         public Builder setPbkdf2Iterations(int iterations){
             this.iterations = iterations;
             return this;
         }
 
+        /**
+         * Set the PBKDF2 salt size in bytes
+         * @param saltSize The salt size (in bytes)
+         * */
         public Builder setPbkdf2SaltSize(int saltSize){
             this.saltSize = saltSize;
             return this;
@@ -86,6 +94,10 @@ public class SecurityConfig {
             return this;
         }
 
+        /**
+         * Set the AES key size in bits
+         * @param keySize The key size (in bits)
+         * */
         public Builder setAesKeySize(int keySize){
             this.aesKeySize = keySize;
             return this;
