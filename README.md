@@ -1,4 +1,4 @@
-## Overview
+## Secure Preferences
 
 A simple library that provides an AES encrypted version of the Android shared preferences
 
