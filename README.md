@@ -1,4 +1,4 @@
-## Secure Preferences [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Secure%20Preferences-green.svg?style=plastic)](https://android-arsenal.com/details/1/5403)
+## Secure Preferences [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.hussainderry/secure-preferences/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.hussainderry/secure-preferences) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Secure%20Preferences-brightgreen.svg?style=plastic)](https://android-arsenal.com/details/1/5403)
 
 A simple library that provides an AES encrypted version of the Android shared preferences
 
