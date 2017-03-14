@@ -6,7 +6,7 @@ A simple library that provides an AES encrypted version of the Android shared pr
 
 #### Gradle
 
-`compile 'com.github.hussainderry:secure-preferences:0.0.2'`
+`compile 'com.github.hussainderry:secure-preferences:0.0.3'`
 
 ## Sample Usage
 ```java
