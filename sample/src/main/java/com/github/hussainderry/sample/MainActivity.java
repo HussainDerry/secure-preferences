@@ -1,15 +1,20 @@
 package com.github.hussainderry.sample;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.github.hussainderry.securepreferences.SecurePreferences;
 import com.github.hussainderry.securepreferences.model.DigestType;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
+
+import java.security.SecureRandom;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,20 +49,20 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Saving to SecurePreferences ...", Toast.LENGTH_SHORT).show();
-                saveToSecurePref("Hello World!");
-                Toast.makeText(MainActivity.this, "Retrieved from Prefs: " + getFromSecurePref(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Saving to Secure Prefs", Toast.LENGTH_SHORT).show();
+                saveToSecurePref("msg", "Hello World!");
+                Toast.makeText(MainActivity.this, "From Secure Prefs: " + getFromSecurePref("msg"), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void saveToSecurePref(String data){
-        mEditor.putString("msg", data);
-        mEditor.commit();
+    private void saveToSecurePref(String key, String data){
+        mEditor.putString(key, data);
+        mEditor.apply();
     }
 
-    private String getFromSecurePref(){
-        return mPreferences.getString("msg", null);
+    private String getFromSecurePref(String key){
+        return mPreferences.getString(key, null);
     }
 
 
