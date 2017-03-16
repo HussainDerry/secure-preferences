@@ -72,9 +72,9 @@ public class SecurityConfig {
 
     public static class Builder{
 
-        private static final int DEFAULT_ITERATIONS = 10000;
-        private static final int DEFAULT_SALT_SIZE = 64;
-        private static final int DEFAULT_AES_KEY_SIZE = 256;
+        private static final int DEFAULT_ITERATIONS = 1000;
+        private static final int DEFAULT_SALT_SIZE = 32;
+        private static final int DEFAULT_AES_KEY_SIZE = 128;
         private static final DigestType DEFAULT_DIGEST = DigestType.SHA256;
 
         private char[] password;
