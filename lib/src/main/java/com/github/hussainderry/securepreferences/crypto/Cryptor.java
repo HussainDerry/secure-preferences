@@ -65,7 +65,7 @@ public final class Cryptor {
      * @param data The data to be encrypted.
      * @return Base64 String to be stored.
      * */
-    public synchronized String encryptToBase64(byte[] data){
+    public String encryptToBase64(byte[] data){
         // Generating Random IV
         SecureRandom mRandom = new SecureRandom();
         byte[] iv = new byte[AES_IV_SIZE];
@@ -75,7 +75,7 @@ public final class Cryptor {
         byte[] salt = new byte[mSecurityConfig.getSaltSize()];
         mRandom.nextBytes(salt);
 
-        byte[] encrypted = CipherAES.encrypt(pbkdf2(salt), iv, data);
+        byte[] encrypted = new CipherAES().encrypt(pbkdf2(salt), iv, data);
         return new StringBuilder()
                 .append(toBase64(salt))
                 .append(".")
@@ -91,7 +91,7 @@ public final class Cryptor {
      * @param encryptedBase64 The Base64 string to be decrypted.
      * @return The data decrypted as byte array.
      * */
-    public synchronized byte[] decryptFromBase64(String encryptedBase64){
+    public byte[] decryptFromBase64(String encryptedBase64){
         String[] parts = encryptedBase64.split(SPLITTER);
         if(parts.length != 3){
             throw new IllegalArgumentException("Malformed data string");
@@ -101,7 +101,7 @@ public final class Cryptor {
         byte[] iv = fromBase64(parts[INDEX_IV]);
         byte[] cipherText = fromBase64(parts[INDEX_CIPHER_TEXT]);
 
-        return CipherAES.decrypt(pbkdf2(salt), iv, cipherText);
+        return new CipherAES().decrypt(pbkdf2(salt), iv, cipherText);
     }
 
     /**

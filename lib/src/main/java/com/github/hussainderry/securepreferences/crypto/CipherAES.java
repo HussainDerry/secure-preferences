@@ -39,10 +39,13 @@ final class CipherAES{
     private static final String PADDING_TYPE = "PKCS5Padding";
     private static final String ENCRYPTION_MODE;
 
-    private static final Cipher mCipher;
+    private final Cipher mCipher;
 
-    static {
+    static{
         ENCRYPTION_MODE = ENCRYPTION_ALGORITHM + "/" + BLOCK_OPERATION_MODE + "/" + PADDING_TYPE;
+    }
+
+    CipherAES(){
         try{
             mCipher = Cipher.getInstance(ENCRYPTION_MODE);
         }catch(NoSuchAlgorithmException | NoSuchPaddingException e){
@@ -50,7 +53,7 @@ final class CipherAES{
         }
     }
 
-    static byte[] encrypt(byte[] key, byte[] iv, byte[] data){
+    byte[] encrypt(byte[] key, byte[] iv, byte[] data){
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.ENCRYPT_MODE,
@@ -63,7 +66,7 @@ final class CipherAES{
         }
     }
 
-    static byte[] decrypt(byte[] key, byte[] iv, byte[] data){
+    byte[] decrypt(byte[] key, byte[] iv, byte[] data){
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.DECRYPT_MODE,
