@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - 2017-03-19
+### Changed
+- Modified 'Cryptor' to generate a single encryption key per session for better performance.
+
+### Fixed
+- Fixed key inequality issue caused by Base64 encoding configurations.
+
 ## [1.0.0] - 2017-03-17
 ### Added
 - Semantic Versioning Compliance
