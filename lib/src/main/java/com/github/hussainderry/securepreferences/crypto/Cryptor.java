@@ -46,6 +46,8 @@ public final class Cryptor {
 
     /* Encryption Configurations */
     private final SecurityConfig mSecurityConfig;
+    private final byte[] mSalt;
+    private final byte[] mPassword;
 
     /**
      * Initializes the Cryptor with the provided {@link SecurityConfig}
@@ -57,6 +59,13 @@ public final class Cryptor {
 
     private Cryptor(SecurityConfig securityConfig){
         this.mSecurityConfig = securityConfig;
+
+        // Generating Session Salt
+        mSalt = new byte[mSecurityConfig.getSaltSize()];
+        new SecureRandom().nextBytes(mSalt);
+
+        // Generating Session Password
+        mPassword = pbkdf2(mSalt);
     }
 
     /**
@@ -71,13 +80,9 @@ public final class Cryptor {
         byte[] iv = new byte[AES_IV_SIZE];
         mRandom.nextBytes(iv);
 
-        // Generating Salt
-        byte[] salt = new byte[mSecurityConfig.getSaltSize()];
-        mRandom.nextBytes(salt);
-
-        byte[] encrypted = new CipherAES().encrypt(pbkdf2(salt), iv, data);
+        byte[] encrypted = new CipherAES().encrypt(mPassword, iv, data);
         return new StringBuilder()
-                .append(toBase64(salt))
+                .append(toBase64(mSalt))
                 .append(".")
                 .append(toBase64(iv))
                 .append(".")
