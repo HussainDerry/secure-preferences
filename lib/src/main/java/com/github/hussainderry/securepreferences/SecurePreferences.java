@@ -57,7 +57,7 @@ public final class SecurePreferences implements SharedPreferences{
     private String generateKeyHash(String key){
         try{
             byte[] mBytes = HashSHA.hashUsingSHA256(key.getBytes(CHARSET));
-            return new String(Base64.encode(mBytes, Base64.DEFAULT), CHARSET);
+            return Base64.encodeToString(mBytes, Base64.NO_WRAP);
         }catch(UnsupportedEncodingException e){
             throw new IllegalStateException(e.getMessage());
         }
