@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.0.0] - 2017-03-19
 ### Changed
-- Modified 'Cryptor' to generate a single encryption key per session for better performance.
+- Modified `Cryptor` to generate a single encryption key per session for better performance.
 
 ### Fixed
 - Fixed key inequality issue caused by Base64 encoding configurations.
