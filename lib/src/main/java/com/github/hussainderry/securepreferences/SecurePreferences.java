@@ -22,6 +22,7 @@ import android.util.Base64;
 import com.github.hussainderry.securepreferences.crypto.Cryptor;
 import com.github.hussainderry.securepreferences.crypto.HashSHA;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
+import com.github.hussainderry.securepreferences.util.AsyncDataLoader;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
@@ -46,6 +47,9 @@ public final class SecurePreferences implements SharedPreferences{
      * @return The SecurePreferences instance
      * */
     public static SecurePreferences getInstance(Context context, String filename, SecurityConfig securityConfig){
+        if(context == null || filename == null || securityConfig == null){
+            throw new IllegalArgumentException("Params cannot be null!");
+        }
         return new SecurePreferences(context.getApplicationContext(), filename, securityConfig);
     }
 
@@ -148,6 +152,10 @@ public final class SecurePreferences implements SharedPreferences{
     @Override
     public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
         mProxyPreferences.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
+    }
+
+    public AsyncDataLoader getAsyncDataLoader(){
+        return new AsyncDataLoader(this);
     }
 
     public final class Editor implements SharedPreferences.Editor{
