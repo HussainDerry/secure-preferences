@@ -12,9 +12,11 @@ import android.widget.Toast;
 import com.github.hussainderry.securepreferences.SecurePreferences;
 import com.github.hussainderry.securepreferences.model.DigestType;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
+import com.github.hussainderry.securepreferences.util.AsyncDataLoader;
 
 import java.security.SecureRandom;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String FILENAME = "securefile";
     private SecurePreferences mPreferences;
     private SecurePreferences.Editor mEditor;
+    private AsyncDataLoader mAsyncLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         mPreferences = SecurePreferences.getInstance(MainActivity.this, FILENAME, minimumConfig);
         mEditor = mPreferences.edit();
+        mAsyncLoader = mPreferences.getAsyncDataLoader();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -51,7 +55,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "Saving to Secure Prefs", Toast.LENGTH_SHORT).show();
                 saveToSecurePref("msg", "Hello World!");
-                Toast.makeText(MainActivity.this, "From Secure Prefs: " + getFromSecurePref("msg"), Toast.LENGTH_SHORT).show();
+                try {
+                    Toast.makeText(MainActivity.this, "From Secure Prefs: " + getFromSecurePref("msg"), Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -61,8 +69,14 @@ public class MainActivity extends AppCompatActivity {
         mEditor.apply();
     }
 
-    private String getFromSecurePref(String key){
-        return mPreferences.getString(key, null);
+    private String getFromSecurePref(String key) throws Exception{
+        Future<String> mFuture = mAsyncLoader.getString(key, null);
+        while(!mFuture.isDone()){
+            Toast.makeText(this, "Loading from pref!", Toast.LENGTH_SHORT).show();
+            SystemClock.sleep(50);
+        }
+
+        return mFuture.get();
     }
 
 
