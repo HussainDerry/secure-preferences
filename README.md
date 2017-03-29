@@ -6,9 +6,10 @@ A simple library that provides an AES encrypted version of the Android shared pr
 
 #### Gradle
 
-`compile 'com.github.hussainderry:secure-preferences:2.0.0'`
+`compile 'com.github.hussainderry:secure-preferences:2.1.0'`
 
 ## Sample Usage
+### Configuring Encryption Parameters
 ```java
 // Minimum Configurations
 SecurityConfig minimumConfig = new SecurityConfig.Builder(PASSWORD)
@@ -24,6 +25,18 @@ SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD)
 
 SecurePreferences mPreferences = SecurePreferences.getInstance(MainActivity.this, FILENAME, minimumConfig);
 SecurePreferences.Editor mEditor = mPreferences.edit();
+```
+
+### Getting Data Asynchronously
+```java
+AsyncDataLoader mAsyncLoader = mPreferences.getAsyncDataLoader();
+Future<String> mFuture = mAsyncLoader.getString("name", "default");
+
+/* Do something while the data is being fetched */
+
+if(mFuture.isDone()){
+    String data = mFuture.get();
+}
 ```
 
 ## Developed By
