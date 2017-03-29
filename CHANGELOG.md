@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.0] - 2017 -03-29
+### Added
+- Created `AsynDataLoader` to help get data from preferences asynchronously.
+
+### Changed
+- Sample `MainActivity` modified to use `AsyncDataLoader`.
+
 ## [2.0.0] - 2017-03-19
 ### Changed
 - Modified `Cryptor` to generate a single encryption key per session for better performance.
