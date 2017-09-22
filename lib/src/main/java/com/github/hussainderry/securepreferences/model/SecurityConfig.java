@@ -84,6 +84,9 @@ public class SecurityConfig {
         private int aesKeySize = -1;
 
         public Builder(String password){
+            if(password == null){
+                throw new IllegalArgumentException("Password cannot be null!");
+            }
             this.password = password.toCharArray();
         }
 
@@ -92,6 +95,9 @@ public class SecurityConfig {
          * @param iterations The number of iterations
          * */
         public Builder setPbkdf2Iterations(int iterations){
+            if(iterations < 0){
+                throw new IllegalArgumentException("Iterations cannot be less than zero!");
+            }
             this.iterations = iterations;
             return this;
         }
@@ -101,6 +107,10 @@ public class SecurityConfig {
          * @param saltSize The salt size (in bytes)
          * */
         public Builder setPbkdf2SaltSize(int saltSize){
+            if(saltSize < 8 || (saltSize % 8) != 0){
+                throw new IllegalArgumentException("Illegal salt size!");
+            }
+
             this.saltSize = saltSize;
             return this;
         }
