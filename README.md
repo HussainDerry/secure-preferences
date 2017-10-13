@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7f81fd82dae444d38e783f72bfd951d5)](https://www.codacy.com/app/hussain.derry/secure-preferences?utm_source=github.com&utm_medium=referral&utm_content=HussainDerry/secure-preferences&utm_campaign=badger)
 ## Secure Preferences [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.hussainderry/secure-preferences/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.hussainderry/secure-preferences) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Secure%20Preferences-brightgreen.svg?style=plastic)](https://android-arsenal.com/details/1/5403)
 
 A simple library that provides an AES encrypted version of the Android shared preferences
