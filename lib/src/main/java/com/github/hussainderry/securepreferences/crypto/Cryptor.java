@@ -81,13 +81,7 @@ public final class Cryptor {
         mRandom.nextBytes(iv);
 
         byte[] encrypted = new CipherAES().encrypt(mPassword, iv, data);
-        return new StringBuilder()
-                .append(toBase64(mSalt))
-                .append(".")
-                .append(toBase64(iv))
-                .append(".")
-                .append(toBase64(encrypted))
-                .toString();
+        return String.format("%s.%s.%s", toBase64(mSalt), toBase64(iv), toBase64(encrypted));
     }
 
     /**
