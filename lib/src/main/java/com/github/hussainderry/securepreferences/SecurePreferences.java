@@ -15,14 +15,14 @@
  */
 package com.github.hussainderry.securepreferences;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Base64;
-
 import com.github.hussainderry.securepreferences.crypto.Cryptor;
 import com.github.hussainderry.securepreferences.crypto.HashSHA;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
 import com.github.hussainderry.securepreferences.util.AsyncDataLoader;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Base64;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;

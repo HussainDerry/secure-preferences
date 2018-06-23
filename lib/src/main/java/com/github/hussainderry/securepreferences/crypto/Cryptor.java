@@ -16,8 +16,6 @@
 
 package com.github.hussainderry.securepreferences.crypto;
 
-import android.util.Base64;
-
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
 
 import org.spongycastle.crypto.PBEParametersGenerator;
@@ -26,6 +24,8 @@ import org.spongycastle.crypto.digests.SHA256Digest;
 import org.spongycastle.crypto.digests.SHA512Digest;
 import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.spongycastle.crypto.params.KeyParameter;
+
+import android.util.Base64;
 
 import java.security.SecureRandom;
 
