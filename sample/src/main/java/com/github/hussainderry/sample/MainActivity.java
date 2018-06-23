@@ -1,21 +1,18 @@
 package com.github.hussainderry.sample;
 
-import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
-
 import com.github.hussainderry.securepreferences.SecurePreferences;
 import com.github.hussainderry.securepreferences.model.DigestType;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
 import com.github.hussainderry.securepreferences.util.AsyncDataLoader;
 
-import java.security.SecureRandom;
-import java.util.UUID;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Toast;
+
 import java.util.concurrent.Future;
 
 public class MainActivity extends AppCompatActivity {

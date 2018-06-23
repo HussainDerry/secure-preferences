@@ -1,9 +1,5 @@
 package com.github.hussainderry.sample;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
-
 import com.github.hussainderry.securepreferences.SecurePreferences;
 import com.github.hussainderry.securepreferences.model.DigestType;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
@@ -11,6 +7,10 @@ import com.github.hussainderry.securepreferences.model.SecurityConfig;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
 /**
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
