@@ -74,7 +74,7 @@ final class CipherAES{
                         generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
             }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-                throw new IllegalStateException(e.getMessage());
+                throw new IllegalStateException(String.format("%s: %s", e.getClass().getName(), e.getMessage()));
             }
         }
     }
