@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Full Configurations
         SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD)
-                .setAesKeySize(256)
+                .setKeySize(256)
                 .setPbkdf2SaltSize(32)
                 .setPbkdf2Iterations(24000)
                 .setDigestType(DigestType.SHA256)
