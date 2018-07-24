@@ -29,24 +29,36 @@ public class SecurityConfig {
     private final int iPBKDF2_Iterations;
     private final int iSaltSize;
     private final DigestType mDigestType;
-    private final int aesKeySize;
+    private final EncryptionAlgorithm mAlgorithm;
+    private final int keySize;
 
     /**
      * @param password The base password to use
-     * @param aesKeySize The size of the AES key
+     * @param keySize The size of the AES key
      * @param iPBKDF2Iterations Number of iterations for PBKDF2
      * @param saltSize The size of the salt for PBKDF2
      * @param digestType The digest type to use with PBKDF2
+     * @param algorithm The encryption algorithm to use
      * */
-    public SecurityConfig(char[] password, int aesKeySize, int iPBKDF2Iterations, int saltSize, DigestType digestType) {
+    public SecurityConfig(char[] password, int keySize, int iPBKDF2Iterations, int saltSize, DigestType digestType, EncryptionAlgorithm algorithm) {
         this.mPassword = Arrays.copyOf(password, password.length);
         this.iPBKDF2_Iterations = iPBKDF2Iterations;
         this.mDigestType = digestType;
         this.iSaltSize = saltSize;
-        if(aesKeySize == 128 || aesKeySize == 192 || aesKeySize == 256){
-            this.aesKeySize = aesKeySize;
+        this.mAlgorithm = algorithm;
+
+        boolean keySizeCheck = false;
+        for(int size : algorithm.getKeySizes()){
+            if(keySize == size){
+                keySizeCheck = true;
+                break;
+            }
+        }
+
+        if(keySizeCheck){
+            this.keySize = keySize;
         }else{
-            throw new IllegalArgumentException("Invalid AES key size");
+            throw new IllegalArgumentException("Key size is invalid for the selected algorithm");
         }
     }
 
@@ -66,8 +78,12 @@ public class SecurityConfig {
         return iSaltSize;
     }
 
-    public int getAesKeySize(){
-        return aesKeySize;
+    public int getKeySize(){
+        return keySize;
+    }
+
+    public EncryptionAlgorithm getAlgorithm() {
+        return mAlgorithm;
     }
 
     public static class Builder{
@@ -76,12 +92,14 @@ public class SecurityConfig {
         private static final int DEFAULT_SALT_SIZE = 32;
         private static final int DEFAULT_AES_KEY_SIZE = 128;
         private static final DigestType DEFAULT_DIGEST = DigestType.SHA256;
+        private static final EncryptionAlgorithm DEFAULT_ALGORITHM = EncryptionAlgorithm.AES;
 
         private char[] password;
         private int saltSize = -1;
         private int iterations = -1;
         private DigestType digest = null;
         private int aesKeySize = -1;
+        private EncryptionAlgorithm algorithm;
 
         public Builder(String password){
             if(password == null){
@@ -121,11 +139,20 @@ public class SecurityConfig {
         }
 
         /**
-         * Set the AES key size in bits
+         * Set the key size in bits
          * @param keySize The key size (in bits)
          * */
-        public Builder setAesKeySize(int keySize){
+        public Builder setKeySize(int keySize){
             this.aesKeySize = keySize;
+            return this;
+        }
+
+        /**
+         * Set the encryption algorithm
+         * @param algorithm the encryption algorithm to use
+         * */
+        public Builder setEncryptionAlgorithm(EncryptionAlgorithm algorithm){
+            this.algorithm = algorithm;
             return this;
         }
 
@@ -134,8 +161,8 @@ public class SecurityConfig {
             int finalSaltSize = saltSize != -1 ? saltSize : DEFAULT_SALT_SIZE;
             DigestType finalDigest = digest != null ? digest : DEFAULT_DIGEST;
             int finalKeySize = aesKeySize != -1 ? aesKeySize : DEFAULT_AES_KEY_SIZE;
-
-            return new SecurityConfig(password, finalKeySize, finalIterations, finalSaltSize, finalDigest);
+            EncryptionAlgorithm alg = algorithm != null ? algorithm : DEFAULT_ALGORITHM;
+            return new SecurityConfig(password, finalKeySize, finalIterations, finalSaltSize, finalDigest, alg);
         }
     }
 }

@@ -16,6 +16,8 @@
 
 package com.github.hussainderry.securepreferences.crypto;
 
+import com.github.hussainderry.securepreferences.model.EncryptionAlgorithm;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -27,33 +29,52 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-/**
+/***
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
- * @version 1.0
- * */
-final class CipherAES{
+ */
+public final class CipherServiceImpl implements CipherService{
 
-    /* Encryption Variables */
-    private static final String ENCRYPTION_ALGORITHM = "AES";
-    private static final String BLOCK_OPERATION_MODE = "CBC";
-    private static final String PADDING_TYPE = "PKCS5Padding";
-    private static final String ENCRYPTION_MODE;
-
+    private final String mEncryptionAlgorithm;
+    private final int ivSize;
     private final Cipher mCipher;
 
-    static{
-        ENCRYPTION_MODE = ENCRYPTION_ALGORITHM + "/" + BLOCK_OPERATION_MODE + "/" + PADDING_TYPE;
+    public static CipherService getInstance(EncryptionAlgorithm algorithm){
+        switch(algorithm){
+
+            case AES:{
+                return new CipherServiceImpl("AES", "CBC", "PKCS5Padding", 16);
+            }
+
+            case TripleDES:{
+                return new CipherServiceImpl("DESede", "CBC", "PKCS5Padding", 8);
+            }
+
+            default:{
+                throw new IllegalArgumentException("Unknown Algorithm");
+            }
+
+        }
     }
 
-    CipherAES(){
+    private CipherServiceImpl(String algorithm, String blockChaining, String paddingType, int ivSize) {
+        this.mEncryptionAlgorithm = algorithm;
+        this.ivSize = ivSize;
+
         try{
-            mCipher = Cipher.getInstance(ENCRYPTION_MODE);
+            String encryptionMode = String.format("%s/%s/%s", algorithm, blockChaining, paddingType);
+            mCipher = Cipher.getInstance(encryptionMode);
         }catch(NoSuchAlgorithmException | NoSuchPaddingException e){
             throw new IllegalStateException("Unable to initialize cipher, mode might not be supported");
         }
     }
 
-    byte[] encrypt(byte[] key, byte[] iv, byte[] data){
+    @Override
+    public int getIVSize() {
+        return ivSize;
+    }
+
+    @Override
+    public byte[] encrypt(byte[] key, byte[] iv, byte[] data) {
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.ENCRYPT_MODE,
@@ -61,12 +82,13 @@ final class CipherAES{
                         generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
             }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-                throw new IllegalStateException(e.getMessage());
+                throw new IllegalStateException(String.format("%s: %s", e.getClass().getName(), e.getMessage()));
             }
         }
     }
 
-    byte[] decrypt(byte[] key, byte[] iv, byte[] data){
+    @Override
+    public byte[] decrypt(byte[] key, byte[] iv, byte[] data) {
         synchronized(mCipher){
             try{
                 mCipher.init(Cipher.DECRYPT_MODE,
@@ -79,11 +101,11 @@ final class CipherAES{
         }
     }
 
-    private static SecretKeySpec generateSecretKeySpec(byte[] key){
-        return new SecretKeySpec(key, ENCRYPTION_ALGORITHM);
+    private SecretKeySpec generateSecretKeySpec(byte[] key){
+        return new SecretKeySpec(key, mEncryptionAlgorithm);
     }
 
-    private static IvParameterSpec generateIvParameterSpec(byte[] iv){
+    private IvParameterSpec generateIvParameterSpec(byte[] iv){
         return new IvParameterSpec(iv);
     }
 }

@@ -35,9 +35,6 @@ import java.security.SecureRandom;
  * */
 public final class Cryptor {
 
-    /* AES configurations */
-    private static final int AES_IV_SIZE = 16;
-
     /* Variables used for parsing the stored Base64 */
     private static final String SPLITTER = "\\.";
     private static final int INDEX_SALT = 0;
@@ -48,6 +45,7 @@ public final class Cryptor {
     private final SecurityConfig mSecurityConfig;
     private final byte[] mSalt;
     private final byte[] mPassword;
+    private final CipherService mCipherService;
 
     /**
      * Initializes the Cryptor with the provided {@link SecurityConfig}
@@ -59,6 +57,7 @@ public final class Cryptor {
 
     private Cryptor(SecurityConfig securityConfig){
         this.mSecurityConfig = securityConfig;
+        this.mCipherService = CipherServiceImpl.getInstance(mSecurityConfig.getAlgorithm());
 
         // Generating Session Salt
         mSalt = new byte[mSecurityConfig.getSaltSize()];
@@ -77,10 +76,10 @@ public final class Cryptor {
     public String encryptToBase64(byte[] data){
         // Generating Random IV
         SecureRandom mRandom = new SecureRandom();
-        byte[] iv = new byte[AES_IV_SIZE];
+        byte[] iv = new byte[mCipherService.getIVSize()];
         mRandom.nextBytes(iv);
 
-        byte[] encrypted = new CipherAES().encrypt(mPassword, iv, data);
+        byte[] encrypted = mCipherService.encrypt(mPassword, iv, data);
         return String.format("%s.%s.%s", toBase64(mSalt), toBase64(iv), toBase64(encrypted));
     }
 
@@ -100,7 +99,7 @@ public final class Cryptor {
         byte[] iv = fromBase64(parts[INDEX_IV]);
         byte[] cipherText = fromBase64(parts[INDEX_CIPHER_TEXT]);
 
-        return new CipherAES().decrypt(pbkdf2(salt), iv, cipherText);
+        return mCipherService.decrypt(pbkdf2(salt), iv, cipherText);
     }
 
     /**
@@ -136,7 +135,7 @@ public final class Cryptor {
         }
 
         mGenerator.init(passwordBytes, salt, mSecurityConfig.getPBKDF2Iterations());
-        return ((KeyParameter) mGenerator.generateDerivedParameters(mSecurityConfig.getAesKeySize())).getKey();
+        return ((KeyParameter) mGenerator.generateDerivedParameters(mSecurityConfig.getKeySize())).getKey();
     }
 
     private String toBase64(byte[] data){
