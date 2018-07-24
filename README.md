@@ -1,12 +1,13 @@
 ## Secure Preferences [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.hussainderry/secure-preferences/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.hussainderry/secure-preferences) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Secure%20Preferences-brightgreen.svg?style=plastic)](https://android-arsenal.com/details/1/5403) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7f81fd82dae444d38e783f72bfd951d5)](https://www.codacy.com/app/hussain.derry/secure-preferences?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=HussainDerry/secure-preferences&amp;utm_campaign=Badge_Grade)
 
-A simple library that provides an AES encrypted version of the Android shared preferences
+A simple library that provides an encrypted version of the Android shared preferences.
+Current supported algorithms (AES, TripleDES).
 
 ## Setup
 
 #### Gradle
 
-`compile 'com.github.hussainderry:secure-preferences:2.1.1'`
+`compile 'com.github.hussainderry:secure-preferences:3.0.0'`
 
 ## Sample Usage
 ### Configuring Encryption Parameters
@@ -20,6 +21,7 @@ SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD)
         .setAesKeySize(256) // key size in bits
         .setPbkdf2SaltSize(32) // salt size in bytes
         .setPbkdf2Iterations(24000)
+        .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
         .setDigestType(DigestType.SHA256)
         .build();
 
@@ -42,7 +44,7 @@ if(mFuture.isDone()){
 ## Developed By
 
 * Hussain Al-Derry 
- 
+
 &nbsp;&nbsp;&nbsp;**Email** - hussain.derry@gmail.com
 
 ## License

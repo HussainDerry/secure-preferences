@@ -3,7 +3,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2018-07-24
+
+### Added
+
+* `CipherService` that supports different encryption algorithms.
+* TripleDES support.
+
+### Changed
+
+* Modified `Cryptor` and `SecurityConfig` to support the new algorithm selection feature.
+
+### Removed
+
+* AES related classes in favor of the new `CipherService`.
+
 ## [2.1.1] - 2017 -06-23
+
 ### Changed
 - Modified `Cryptor` to use the `String.format()` method instead of using the StringBuilder class.
 
