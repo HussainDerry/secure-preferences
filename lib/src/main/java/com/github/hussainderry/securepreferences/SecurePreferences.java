@@ -15,16 +15,17 @@
  */
 package com.github.hussainderry.securepreferences;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Base64;
+
 import com.github.hussainderry.securepreferences.crypto.Cryptor;
 import com.github.hussainderry.securepreferences.crypto.HashSHA;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
 import com.github.hussainderry.securepreferences.util.AsyncDataLoader;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Base64;
-
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,54 +33,55 @@ import java.util.Set;
 /**
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
  * @version 1.0
- * */
-public final class SecurePreferences implements SharedPreferences{
+ */
+public final class SecurePreferences implements SharedPreferences {
 
     private static final String CHARSET = "UTF-8";
-    private final Cryptor mCryptor;
+    private Cryptor mCryptor;
     private SharedPreferences mProxyPreferences;
-
-    /**
-     * Creates an instance of the preferences using the provided security configurations.
-     * @param context The context to be used to create the instance
-     * @param filename The preferences filename
-     * @param securityConfig The security configurations to use
-     * @return The SecurePreferences instance
-     * */
-    public static SecurePreferences getInstance(Context context, String filename, SecurityConfig securityConfig){
-        if(context == null || filename == null || securityConfig == null){
-            throw new IllegalArgumentException("Params cannot be null!");
-        }
-        return new SecurePreferences(context.getApplicationContext(), filename, securityConfig);
-    }
 
     private SecurePreferences(Context context, String fileName, SecurityConfig securityConfig) {
         this.mCryptor = Cryptor.initWithSecurityConfig(securityConfig);
         this.mProxyPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
     }
 
-    private String generateKeyHash(String key){
-        try{
+    /**
+     * Creates an instance of the preferences using the provided security configurations.
+     *
+     * @param context        The context to be used to create the instance
+     * @param filename       The preferences filename
+     * @param securityConfig The security configurations to use
+     * @return The SecurePreferences instance
+     */
+    public static SecurePreferences getInstance(Context context, String filename, SecurityConfig securityConfig) {
+        if (context == null || filename == null || securityConfig == null) {
+            throw new IllegalArgumentException("Params cannot be null!");
+        }
+        return new SecurePreferences(context.getApplicationContext(), filename, securityConfig);
+    }
+
+    private String generateKeyHash(String key) {
+        try {
             byte[] mBytes = HashSHA.hashUsingSHA256(key.getBytes(CHARSET));
             return Base64.encodeToString(mBytes, Base64.NO_WRAP);
-        }catch(UnsupportedEncodingException e){
+        } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e.getMessage());
         }
     }
 
-    private String encryptToBase64(String data){
-        try{
+    private String encryptToBase64(String data) {
+        try {
             return mCryptor.encryptToBase64(data.getBytes(CHARSET));
-        }catch(UnsupportedEncodingException e){
+        } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e.getMessage());
         }
     }
 
-    private String decryptFromBase64(String base64Data){
-        try{
+    private String decryptFromBase64(String base64Data) {
+        try {
             byte[] decrypted = mCryptor.decryptFromBase64(base64Data);
             return new String(decrypted, CHARSET);
-        }catch(UnsupportedEncodingException e){
+        } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e.getMessage());
         }
     }
@@ -89,8 +91,27 @@ public final class SecurePreferences implements SharedPreferences{
         throw new UnsupportedOperationException("Operation Not Supported!");
     }
 
+    public void changePassword(SecurityConfig securityConfig) {
+        final Map<String, ?> encryptedData = mProxyPreferences.getAll();
+
+        Map<String, String> decryptedData = new HashMap<>();
+        for (String key : encryptedData.keySet())
+            decryptedData.put(key, decryptFromBase64(mProxyPreferences.getString(key, null)));
+
+        this.mCryptor = Cryptor.initWithSecurityConfig(securityConfig);
+        SharedPreferences.Editor mProxyEditor = SecurePreferences.this.mProxyPreferences.edit();
+
+        for (String key : decryptedData.keySet()) {
+            String data = encryptToBase64(decryptedData.get(key));
+            mProxyEditor.putString(key, data);
+        }
+
+        mProxyEditor.apply();
+    }
+
+
     @Override
-    public String getString(String key, String defValue){
+    public String getString(String key, String defValue) {
         final String encryptedData = mProxyPreferences.getString(generateKeyHash(key), null);
         return encryptedData != null ? decryptFromBase64(encryptedData) : defValue;
     }
@@ -99,13 +120,13 @@ public final class SecurePreferences implements SharedPreferences{
     public Set<String> getStringSet(String key, Set<String> defSet) {
         Set<String> encryptedSet = mProxyPreferences.getStringSet(generateKeyHash(key), null);
 
-        if(encryptedSet != null){
+        if (encryptedSet != null) {
             Set<String> plainSet = new HashSet<>();
-            for(String temp : encryptedSet) {
+            for (String temp : encryptedSet) {
                 plainSet.add(decryptFromBase64(temp));
             }
             return plainSet;
-        }else{
+        } else {
             return defSet;
         }
     }
@@ -154,20 +175,20 @@ public final class SecurePreferences implements SharedPreferences{
         mProxyPreferences.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
     }
 
-    public AsyncDataLoader getAsyncDataLoader(){
+    public AsyncDataLoader getAsyncDataLoader() {
         return new AsyncDataLoader(this);
     }
 
-    public final class Editor implements SharedPreferences.Editor{
+    public final class Editor implements SharedPreferences.Editor {
 
         protected SharedPreferences.Editor mProxyEditor;
 
-        public Editor(){
+        public Editor() {
             this.mProxyEditor = SecurePreferences.this.mProxyPreferences.edit();
         }
 
         @Override
-        public SecurePreferences.Editor putString(String key, String data){
+        public SecurePreferences.Editor putString(String key, String data) {
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(data);
             mProxyEditor.putString(hashedKey, encryptedData);
@@ -179,7 +200,7 @@ public final class SecurePreferences implements SharedPreferences{
             String hashedKey = generateKeyHash(key);
             Set<String> encryptedSet = new HashSet<>();
 
-            for(String temp : set) {
+            for (String temp : set) {
                 encryptedSet.add(encryptToBase64(temp));
             }
 
@@ -196,7 +217,7 @@ public final class SecurePreferences implements SharedPreferences{
         }
 
         @Override
-        public SecurePreferences.Editor putLong(String key, long data){
+        public SecurePreferences.Editor putLong(String key, long data) {
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(Long.toString(data));
             mProxyEditor.putString(hashedKey, encryptedData);
