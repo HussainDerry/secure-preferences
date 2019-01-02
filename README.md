@@ -18,7 +18,7 @@ SecurityConfig minimumConfig = new SecurityConfig.Builder(PASSWORD)
 
 // Full Configurations
 SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD)
-        .setAesKeySize(256) // key size in bits
+        .setKeySize(256) // key size in bits
         .setPbkdf2SaltSize(32) // salt size in bytes
         .setPbkdf2Iterations(24000)
         .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
