@@ -7,7 +7,7 @@ Current supported algorithms (AES, TripleDES).
 
 #### Gradle
 
-`compile 'com.github.hussainderry:secure-preferences:3.0.0'`
+`compile 'com.github.hussainderry:secure-preferences:3.0.1'`
 
 ## Sample Usage
 ### Configuring Encryption Parameters

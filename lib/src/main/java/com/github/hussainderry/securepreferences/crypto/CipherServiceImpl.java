@@ -21,6 +21,8 @@ import com.github.hussainderry.securepreferences.model.EncryptionAlgorithm;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -34,6 +36,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public final class CipherServiceImpl implements CipherService{
 
+    private final Logger mLogger;
     private final String mEncryptionAlgorithm;
     private final int ivSize;
     private final Cipher mCipher;
@@ -59,11 +62,14 @@ public final class CipherServiceImpl implements CipherService{
     private CipherServiceImpl(String algorithm, String blockChaining, String paddingType, int ivSize) {
         this.mEncryptionAlgorithm = algorithm;
         this.ivSize = ivSize;
+        this.mLogger = Logger.getLogger(CipherService.class.getName());
 
         try{
             String encryptionMode = String.format("%s/%s/%s", algorithm, blockChaining, paddingType);
+            mLogger.info("Encryption-Mode: " + encryptionMode);
             mCipher = Cipher.getInstance(encryptionMode);
         }catch(NoSuchAlgorithmException | NoSuchPaddingException e){
+            mLogger.log(Level.SEVERE, "method: constructor()", e);
             throw new IllegalStateException("Unable to initialize cipher, mode might not be supported");
         }
     }
@@ -82,6 +88,7 @@ public final class CipherServiceImpl implements CipherService{
                         generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
             }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+                mLogger.log(Level.SEVERE, "method: encrypt()", e);
                 throw new IllegalStateException(String.format("%s: %s", e.getClass().getName(), e.getMessage()));
             }
         }
@@ -96,6 +103,7 @@ public final class CipherServiceImpl implements CipherService{
                         generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
             }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+                mLogger.log(Level.SEVERE, "method: decrypt()", e);
                 throw new IllegalStateException(String.format("%s: %s", e.getClass().getName(), e.getMessage()));
             }
         }
