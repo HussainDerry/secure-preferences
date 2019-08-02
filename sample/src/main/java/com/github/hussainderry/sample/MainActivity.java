@@ -2,6 +2,7 @@ package com.github.hussainderry.sample;
 
 import com.github.hussainderry.securepreferences.SecurePreferences;
 import com.github.hussainderry.securepreferences.model.DigestType;
+import com.github.hussainderry.securepreferences.model.EncryptionAlgorithm;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
 import com.github.hussainderry.securepreferences.util.AsyncDataLoader;
 
@@ -37,12 +38,13 @@ public class MainActivity extends AppCompatActivity {
         // Full Configurations
         SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD)
                 .setKeySize(256)
-                .setPbkdf2SaltSize(32)
+                .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
+                .setPbkdf2SaltSize(64)
                 .setPbkdf2Iterations(24000)
                 .setDigestType(DigestType.SHA256)
                 .build();
 
-        mPreferences = SecurePreferences.getInstance(MainActivity.this, FILENAME, minimumConfig);
+        mPreferences = SecurePreferences.getInstance(MainActivity.this, FILENAME, fullConfig);
         mEditor = mPreferences.edit();
         mAsyncLoader = mPreferences.getAsyncDataLoader();
 
