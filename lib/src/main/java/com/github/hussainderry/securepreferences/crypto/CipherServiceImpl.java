@@ -28,6 +28,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -45,7 +46,7 @@ public final class CipherServiceImpl implements CipherService{
         switch(algorithm){
 
             case AES:{
-                return new CipherServiceImpl("AES", "CBC", "PKCS5Padding", 16);
+                return new CipherServiceImpl("AES", "GCM", "NoPadding", 12);
             }
 
             case TripleDES:{
@@ -83,11 +84,9 @@ public final class CipherServiceImpl implements CipherService{
     public byte[] encrypt(byte[] key, byte[] iv, byte[] data) {
         synchronized(mCipher){
             try{
-                mCipher.init(Cipher.ENCRYPT_MODE,
-                        generateSecretKeySpec(key),
-                        generateIvParameterSpec(iv));
+                mCipher.init(Cipher.ENCRYPT_MODE, generateSecretKeySpec(key), generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
-            }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            }catch(InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
                 mLogger.log(Level.SEVERE, "method: encrypt()", e);
                 throw new IllegalStateException(String.format("%s: %s", e.getClass().getName(), e.getMessage()));
             }
@@ -98,18 +97,16 @@ public final class CipherServiceImpl implements CipherService{
     public byte[] decrypt(byte[] key, byte[] iv, byte[] data) {
         synchronized(mCipher){
             try{
-                mCipher.init(Cipher.DECRYPT_MODE,
-                        generateSecretKeySpec(key),
-                        generateIvParameterSpec(iv));
+                mCipher.init(Cipher.DECRYPT_MODE, generateSecretKeySpec(key), generateIvParameterSpec(iv));
                 return mCipher.doFinal(data);
-            }catch (InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+            }catch(InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
                 mLogger.log(Level.SEVERE, "method: decrypt()", e);
                 throw new IllegalStateException(String.format("%s: %s", e.getClass().getName(), e.getMessage()));
             }
         }
     }
 
-    private SecretKeySpec generateSecretKeySpec(byte[] key){
+    private SecretKey generateSecretKeySpec(byte[] key){
         return new SecretKeySpec(key, mEncryptionAlgorithm);
     }
 
