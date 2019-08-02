@@ -7,7 +7,7 @@ Current supported algorithms (AES, TripleDES).
 
 #### Gradle
 
-`compile 'com.github.hussainderry:secure-preferences:3.0.1'`
+`compile 'com.github.hussainderry:secure-preferences:4.0.0'`
 
 ## Sample Usage
 ### Configuring Encryption Parameters
@@ -30,6 +30,9 @@ SecurePreferences.Editor mEditor = mPreferences.edit();
 ```
 
 ### Getting Data Asynchronously
+
+#### Using `Future<T>`
+
 ```java
 AsyncDataLoader mAsyncLoader = mPreferences.getAsyncDataLoader();
 Future<String> mFuture = mAsyncLoader.getString("name", "default");
@@ -40,6 +43,19 @@ if(mFuture.isDone()){
     String data = mFuture.get();
 }
 ```
+
+#### Using `DataCallback<T>`
+
+```java
+mPreferences.getAsyncDataLoader().getString("key", "default", new DataCallback<String>(){
+	@Override
+	public void onDataLoaded(String data){
+		System.out.println(data);
+	}
+});
+```
+
+
 
 ## Developed By
 

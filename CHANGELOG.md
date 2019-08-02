@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.0] - 2019-07-28
+
+### Added
+
+* `AsyncDataLoader` now provides callback style loading via `DataCallback<T>`
+
+### Changed
+
+* `CipherServiceImpl` now uses `GCM` mode for `AES` 
+
 ## [3.0.0] - 2018-07-24
 
 ### Added
