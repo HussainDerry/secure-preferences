@@ -95,4 +95,58 @@ public class AsyncDataLoader{
             }
         });
     }
+
+    public void getString(final String key, final String defValue, final DataCallback<String> callback){
+        mExecutorService.execute(new Runnable(){
+            @Override
+            public void run(){
+                callback.onDataLoaded(mPreferences.getString(key, defValue));
+            }
+        });
+    }
+
+    public void getStringSet(final String key, final Set<String> defSet, final DataCallback<Set<String>> callback){
+        mExecutorService.execute(new Runnable(){
+            @Override
+            public void run(){
+                callback.onDataLoaded(mPreferences.getStringSet(key, defSet));
+            }
+        });
+    }
+
+    public void getInt(final String key, final Integer defValue, final DataCallback<Integer> callback){
+        mExecutorService.execute(new Runnable(){
+            @Override
+            public void run(){
+                callback.onDataLoaded(mPreferences.getInt(key, defValue));
+            }
+        });
+    }
+
+    public void getLong(final String key, final Long defValue, final DataCallback<Long> callback){
+        mExecutorService.execute(new Runnable(){
+            @Override
+            public void run(){
+                callback.onDataLoaded(mPreferences.getLong(key, defValue));
+            }
+        });
+    }
+
+    public void getFloat(final String key, final Float defValue, final DataCallback<Float> callback){
+        mExecutorService.execute(new Runnable(){
+            @Override
+            public void run(){
+                callback.onDataLoaded(mPreferences.getFloat(key, defValue));
+            }
+        });
+    }
+
+    public void getBoolean(final String key, final Boolean defValue, final DataCallback<Boolean> callback){
+        mExecutorService.execute(new Runnable(){
+            @Override
+            public void run(){
+                callback.onDataLoaded(mPreferences.getBoolean(key, defValue));
+            }
+        });
+    }
 }
