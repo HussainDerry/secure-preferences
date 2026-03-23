@@ -24,6 +24,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    lint {
+        abortOnError true
+        warningsAsErrors false
+        checkReleaseBuilds true
+        fatal 'NewApi', 'InlinedApi'
+        baseline file("lint-baseline.xml")
+    }
 }
 
 afterEvaluate {

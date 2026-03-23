@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- API level compatibility is enforced via lint 'NewApi' and 'InlinedApi' as fatal.
+         Add explicit exemptions here only when reflection or runtime checks are used. -->
+</lint>
