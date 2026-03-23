@@ -50,6 +50,7 @@ public final class Cryptor implements Closeable{
     private final byte[] mSalt;
     private final byte[] mPassword;
     private final CipherService mCipherService;
+    private volatile boolean mClosed = false;
 
     /**
      * Initializes the Cryptor with the provided {@link SecurityConfig}
@@ -76,8 +77,15 @@ public final class Cryptor implements Closeable{
 
     @Override
     public void close(){
+        mClosed = true;
         Arrays.fill(mPassword, (byte) 0);
         Arrays.fill(mSalt, (byte) 0);
+    }
+
+    private void checkNotClosed(){
+        if(mClosed){
+            throw new IllegalStateException("Cryptor has been closed");
+        }
     }
 
     /**
@@ -87,6 +95,7 @@ public final class Cryptor implements Closeable{
      * @return Base64 String to be stored.
      * */
     public String encryptToBase64(byte[] data){
+        checkNotClosed();
         // Generating Random IV
         SecureRandom mRandom = new SecureRandom();
         byte[] iv = new byte[mCipherService.getIVSize()];
@@ -103,6 +112,7 @@ public final class Cryptor implements Closeable{
      * @return The data decrypted as byte array.
      * */
     public byte[] decryptFromBase64(String encryptedBase64){
+        checkNotClosed();
         String[] parts = encryptedBase64.split(SPLITTER);
         if(parts.length != 3){
             throw new DataIntegrityException("Malformed data string");

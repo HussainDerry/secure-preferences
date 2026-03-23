@@ -6,6 +6,7 @@ import com.github.hussainderry.securepreferences.model.EncryptionAlgorithm;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
 import com.github.hussainderry.securepreferences.util.DataCallback;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +48,7 @@ public class DataLoaderTest{
 
 			@Override
 			public void onDataLoaded(String data){
-				assert "John Doe".equals(data);
+				Assert.assertEquals("John Doe", data);
 			}
 		});
 	}

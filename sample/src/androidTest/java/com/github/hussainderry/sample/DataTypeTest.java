@@ -5,6 +5,7 @@ import com.github.hussainderry.securepreferences.model.DigestType;
 import com.github.hussainderry.securepreferences.model.EncryptionAlgorithm;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,9 +48,9 @@ public class DataTypeTest{
 		mEditor.putFloat("test-float", 2.5f);
 		mEditor.commit();
 
-		assert 44 == mPreferences.getInt("test-int", -1);
-		assert 55 == mPreferences.getLong("test-int", -1);
-		assert 2.5 == mPreferences.getFloat("test-int", -1);
+		Assert.assertEquals(44, mPreferences.getInt("test-int", -1));
+		Assert.assertEquals(55, mPreferences.getLong("test-long", -1));
+		Assert.assertEquals(2.5f, mPreferences.getFloat("test-float", -1), 0.001f);
 	}
 
 	@Test
@@ -67,8 +68,8 @@ public class DataTypeTest{
 		mEditor.putStringSet("test-strset", mSet);
 		mEditor.commit();
 
-		assert "Hello World!".equals(mPreferences.getString("test-str", "-1"));
-		assert mSet.equals(mPreferences.getStringSet("test-strset", null));
+		Assert.assertEquals("Hello World!", mPreferences.getString("test-str", "-1"));
+		Assert.assertEquals(mSet, mPreferences.getStringSet("test-strset", null));
 	}
 
 	@Test
@@ -80,7 +81,7 @@ public class DataTypeTest{
 		mEditor.putBoolean("isLoggedIn", true);
 		mEditor.commit();
 
-		assert mPreferences.getBoolean("isLoggedIn", false);
+		Assert.assertTrue(mPreferences.getBoolean("isLoggedIn", false));
 	}
 
 }
