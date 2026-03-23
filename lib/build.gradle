@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply from: 'maven-push.gradle'
+apply plugin: 'maven-publish'
 
 android {
     namespace 'com.github.hussainderry.securepreferences'
@@ -22,6 +22,19 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = GROUP
+                artifactId = 'secure-preferences'
+                version = VERSION_NAME
+            }
+        }
     }
 }
 

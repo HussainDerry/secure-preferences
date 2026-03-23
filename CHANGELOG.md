@@ -3,6 +3,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.0.0] - 2026-03-23
+
+### Added
+
+* Domain exception hierarchy (`SecurePreferencesException`, `CipherOperationException`, `DataIntegrityException`, `InvalidConfigurationException`)
+* `Closeable` support on `SecurePreferences` and `Cryptor` to zero key material
+* Null-check guard clauses on public entry points
+* Publishing via JitPack (replaces Maven Central)
+
+### Changed
+
+* **BREAKING:** `SecurityConfig.Builder` now accepts `char[]` instead of `String`
+* AES-GCM now uses `GCMParameterSpec` with 128-bit auth tag (was `IvParameterSpec`)
+* Default PBKDF2 iterations raised from 1,000 to 210,000 (minimum 10,000)
+* Migrated from SpongyCastle to BouncyCastle (`bcprov-jdk18on:1.78.1`)
+* Migrated from Android Support Library to AndroidX
+* Upgraded AGP 3.1.3 to 7.4.2, Gradle 5.1.1 to 7.5.1
+* Switched distribution from Maven Central to JitPack
+* `AsyncDataLoader` uses bounded thread pool with `shutdown()` method
+* All classes marked `final` where appropriate
+* Defensive copies on `getPassword()` and `getKeySizes()`
+
+### Removed
+
+* Retrolambda plugin (AGP 7 has native Java 8 desugaring)
+* JCenter repository (sunset)
+* Travis CI config (replaced by GitHub Actions)
+
 ## [4.0.0] - 2019-07-28
 
 ### Added

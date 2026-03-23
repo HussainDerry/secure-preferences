@@ -1,23 +1,39 @@
-## Secure Preferences [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.hussainderry/secure-preferences/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.hussainderry/secure-preferences) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Secure%20Preferences-brightgreen.svg?style=plastic)](https://android-arsenal.com/details/1/5403) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7f81fd82dae444d38e783f72bfd951d5)](https://www.codacy.com/app/hussain.derry/secure-preferences?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=HussainDerry/secure-preferences&amp;utm_campaign=Badge_Grade)
+## Secure Preferences
+
+[![](https://jitpack.io/v/HussainDerry/secure-preferences.svg)](https://jitpack.io/#HussainDerry/secure-preferences)
 
 A simple library that provides an encrypted version of the Android shared preferences.
-Current supported algorithms (AES, TripleDES).
+Current supported algorithms (AES-GCM, TripleDES-CBC) with PBKDF2 key derivation (SHA1/SHA256/SHA512).
 
 ## Setup
 
-#### Gradle
+Add the JitPack repository to your `settings.gradle`:
 
-`compile 'com.github.hussainderry:secure-preferences:4.0.0'`
+```groovy
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+Add the dependency to your module `build.gradle`:
+
+```groovy
+implementation 'com.github.HussainDerry:secure-preferences:v5.0.0'
+```
 
 ## Sample Usage
 ### Configuring Encryption Parameters
 ```java
 // Minimum Configurations
-SecurityConfig minimumConfig = new SecurityConfig.Builder(PASSWORD)
+SecurityConfig minimumConfig = new SecurityConfig.Builder("password".toCharArray())
         .build();
 
 // Full Configurations
-SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD)
+SecurityConfig fullConfig = new SecurityConfig.Builder("password".toCharArray())
         .setKeySize(256) // key size in bits
         .setPbkdf2SaltSize(32) // salt size in bytes
         .setPbkdf2Iterations(24000)
@@ -55,11 +71,9 @@ mPreferences.getAsyncDataLoader().getString("key", "default", new DataCallback<S
 });
 ```
 
-
-
 ## Developed By
 
-* Hussain Al-Derry 
+* Hussain Al-Derry
 
 &nbsp;&nbsp;&nbsp;**Email** - hussain.derry@gmail.com
 
