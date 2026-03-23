@@ -1,4 +1,24 @@
 <resources>
-    <string name="app_name">Sample</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="app_name">Secure Preferences Demo</string>
+    <string name="title_activity_main">Secure Preferences</string>
+
+    <!-- Section headers -->
+    <string name="section_config">Configuration</string>
+    <string name="section_store">Store Data</string>
+    <string name="section_read">Read Data</string>
+    <string name="section_operations">Operations</string>
+    <string name="section_output">Output</string>
+
+    <!-- Buttons -->
+    <string name="btn_store_string">Store String</string>
+    <string name="btn_store_all_types">Store All Types</string>
+    <string name="btn_read_all">Read All (getAll)</string>
+    <string name="btn_read_async">Read Async (Callback)</string>
+    <string name="btn_remove_key">Remove \"name\"</string>
+    <string name="btn_clear_all">Clear All</string>
+    <string name="btn_close_and_read">Close + Try Read</string>
+    <string name="btn_reinitialize">Reinitialize</string>
+
+    <!-- Hints -->
+    <string name="hint_enter_value">Enter a value to store</string>
 </resources>

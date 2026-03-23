@@ -131,13 +131,20 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
      * */
     @Override
     public Map<String, ?> getAll() {
-        Map<String, String> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
+        Map<String, ?> rawAll = mProxyPreferences.getAll();
         for(Map.Entry<String, String> entry : mKeyMap.entrySet()){
             String hashedKey = entry.getKey();
             String originalKey = entry.getValue();
-            String encryptedValue = mProxyPreferences.getString(hashedKey, null);
-            if(encryptedValue != null){
-                result.put(originalKey, decryptFromBase64(encryptedValue));
+            Object rawValue = rawAll.get(hashedKey);
+            if(rawValue instanceof String){
+                result.put(originalKey, decryptFromBase64((String) rawValue));
+            }else if(rawValue instanceof Set){
+                Set<String> decryptedSet = new HashSet<>();
+                for(String encrypted : (Set<String>) rawValue){
+                    decryptedSet.add(decryptFromBase64(encrypted));
+                }
+                result.put(originalKey, decryptedSet);
             }
         }
         return result;
