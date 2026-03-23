@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.2.0] - 2026-03-23
+
+### Added
+
+* ChaCha20-Poly1305 authenticated encryption (`EncryptionAlgorithm.CHACHA20`, 256-bit key)
+* Argon2id key derivation (`DigestType.ARGON2`) — memory-hard, GPU/ASIC resistant
+* 5 new algorithm combination tests (37 total)
+
+### Changed
+
+* Renamed internal `pbkdf2()` to `deriveKey()` to reflect support for multiple KDFs
+* Renamed `isGcmMode` to `useGcmParameterSpec` for clarity
+
 ## [5.1.1] - 2026-03-23
 
 ### Fixed

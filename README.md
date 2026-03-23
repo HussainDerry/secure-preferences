@@ -2,14 +2,15 @@
 
 [![](https://jitpack.io/v/HussainDerry/secure-preferences.svg)](https://jitpack.io/#HussainDerry/secure-preferences)
 
-An encrypted drop-in replacement for Android's `SharedPreferences`. Full API compatibility including `getAll()` and change listeners. Password-based encryption with configurable algorithms and PBKDF2 key derivation.
+An encrypted drop-in replacement for Android's `SharedPreferences`. Full API compatibility including `getAll()` and change listeners. Supports AES-GCM, ChaCha20-Poly1305, with PBKDF2 or Argon2 key derivation.
 
 ### Why this library?
 
 | | secure-preferences | Jetpack EncryptedSharedPreferences |
 |---|---|---|
 | minSdk | **14** | 23 |
-| Key derivation | Password-based (PBKDF2) | Android KeyStore (device-bound) |
+| Encryption | AES-GCM, ChaCha20-Poly1305 | AES-256-GCM only |
+| Key derivation | PBKDF2 or Argon2 | Android KeyStore (device-bound) |
 | Data portability | Yes (same password = same keys) | No |
 | Async loading | Built-in Future + Callback | No |
 | Configuration | Full control (algo, iterations, key size) | Opinionated defaults only |
@@ -32,24 +33,31 @@ dependencyResolutionManagement {
 Add the dependency to your module `build.gradle`:
 
 ```groovy
-implementation 'com.github.HussainDerry:secure-preferences:v5.1.1'
+implementation 'com.github.HussainDerry:secure-preferences:v5.2.0'
 ```
 
 ## Sample Usage
 
 ### Configuring Encryption Parameters
 ```java
-// Minimum Configurations (AES-128-GCM, SHA256, 210k iterations)
-SecurityConfig minimumConfig = new SecurityConfig.Builder("password".toCharArray())
+// Default (AES-128-GCM, PBKDF2-SHA256, 210k iterations)
+SecurityConfig defaultConfig = new SecurityConfig.Builder("password".toCharArray())
         .build();
 
-// Full Configurations
-SecurityConfig fullConfig = new SecurityConfig.Builder("password".toCharArray())
-        .setKeySize(256) // key size in bits
-        .setPbkdf2SaltSize(32) // salt size in bytes
+// AES-256-GCM with PBKDF2
+SecurityConfig aesConfig = new SecurityConfig.Builder("password".toCharArray())
+        .setKeySize(256)
+        .setPbkdf2SaltSize(32)
         .setPbkdf2Iterations(24000)
         .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
         .setDigestType(DigestType.SHA256)
+        .build();
+
+// ChaCha20-Poly1305 with Argon2 (modern, GPU-resistant)
+SecurityConfig modernConfig = new SecurityConfig.Builder("password".toCharArray())
+        .setEncryptionAlgorithm(EncryptionAlgorithm.CHACHA20)
+        .setDigestType(DigestType.ARGON2)
+        .setPbkdf2Iterations(10000)
         .build();
 
 SecurePreferences mPreferences = SecurePreferences.getInstance(MainActivity.this, FILENAME, minimumConfig);

@@ -155,4 +155,75 @@ public class SecurityConfigTest {
         Assert.assertEquals(MSG, decrypted);
     }
 
+    @Test
+    public void testChaCha20_256_Sha256(){
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
+                .setDigestType(DigestType.SHA256)
+                .setEncryptionAlgorithm(EncryptionAlgorithm.CHACHA20)
+                .setKeySize(256)
+                .build();
+
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
+        SecurePreferences.Editor mEditor = mPreferences.edit();
+        mEditor.putString("msg", MSG).commit();
+
+        String decrypted = mPreferences.getString("msg", null);
+        Assert.assertEquals(MSG, decrypted);
+    }
+
+    @Test
+    public void testChaCha20_256_Sha512(){
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
+                .setDigestType(DigestType.SHA512)
+                .setEncryptionAlgorithm(EncryptionAlgorithm.CHACHA20)
+                .setKeySize(256)
+                .setPbkdf2Iterations(80000)
+                .build();
+
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
+        SecurePreferences.Editor mEditor = mPreferences.edit();
+        mEditor.putString("msg", MSG).commit();
+
+        String decrypted = mPreferences.getString("msg", null);
+        Assert.assertEquals(MSG, decrypted);
+    }
+
+    @Test
+    public void testAes256Argon2(){
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
+                .setDigestType(DigestType.ARGON2)
+                .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
+                .setKeySize(256)
+                .setPbkdf2Iterations(10_000)
+                .build();
+
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
+        SecurePreferences.Editor mEditor = mPreferences.edit();
+        mEditor.putString("msg", MSG).commit();
+
+        String decrypted = mPreferences.getString("msg", null);
+        Assert.assertEquals(MSG, decrypted);
+    }
+
+    @Test
+    public void testChaCha20Argon2(){
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
+                .setDigestType(DigestType.ARGON2)
+                .setEncryptionAlgorithm(EncryptionAlgorithm.CHACHA20)
+                .setKeySize(256)
+                .setPbkdf2Iterations(10_000)
+                .build();
+
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
+        SecurePreferences.Editor mEditor = mPreferences.edit();
+        mEditor.putString("msg", MSG).commit();
+
+        String decrypted = mPreferences.getString("msg", null);
+        Assert.assertEquals(MSG, decrypted);
+    }
+
 }

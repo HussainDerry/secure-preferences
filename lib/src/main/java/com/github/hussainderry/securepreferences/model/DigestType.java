@@ -23,6 +23,6 @@ package com.github.hussainderry.securepreferences.model;
  * */
 public enum DigestType {
 
-    SHA1, SHA256, SHA512
+    SHA1, SHA256, SHA512, ARGON2
 
 }

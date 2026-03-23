@@ -24,7 +24,9 @@ import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 import android.util.Base64;
@@ -73,7 +75,7 @@ public final class Cryptor implements Closeable{
         new SecureRandom().nextBytes(mSalt);
 
         // Generating Session Password
-        mPassword = pbkdf2(mSalt);
+        mPassword = deriveKey(mSalt);
     }
 
     @Override
@@ -131,19 +133,45 @@ public final class Cryptor implements Closeable{
         byte[] iv = fromBase64(parts[offset + INDEX_IV]);
         byte[] cipherText = fromBase64(parts[offset + INDEX_CIPHER_TEXT]);
 
-        return mCipherService.decrypt(pbkdf2(salt), iv, cipherText);
+        return mCipherService.decrypt(deriveKey(salt), iv, cipherText);
     }
 
     /**
-     * Generates PBKDF2 hash for the configured password using the provided salt
+     * Derives an encryption key from the configured password using the selected KDF.
      *
      * @param salt The salt to use.
-     * @return The password hash as byte array
+     * @return The derived key as byte array
      * */
-    private byte[] pbkdf2(byte[] salt){
+    private byte[] deriveKey(byte[] salt){
         byte[] passwordBytes = PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(mSecurityConfig.getPassword());
+        int keySizeBytes = mSecurityConfig.getKeySize() / 8;
+
+        switch(mSecurityConfig.getDigestType()){
+
+            case ARGON2:{
+                Argon2Parameters params = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
+                        .withSalt(salt)
+                        .withIterations(mSecurityConfig.getPBKDF2Iterations())
+                        .withMemoryAsKB(65536)
+                        .withParallelism(1)
+                        .build();
+                Argon2BytesGenerator generator = new Argon2BytesGenerator();
+                generator.init(params);
+                byte[] key = new byte[keySizeBytes];
+                generator.generateBytes(passwordBytes, key);
+                return key;
+            }
+
+            default:{
+                return deriveKeyPbkdf2(passwordBytes, salt);
+            }
+
+        }
+    }
+
+    private byte[] deriveKeyPbkdf2(byte[] passwordBytes, byte[] salt){
         PKCS5S2ParametersGenerator mGenerator;
-        switch (mSecurityConfig.getDigestType()){
+        switch(mSecurityConfig.getDigestType()){
 
             case SHA1:{
                 mGenerator = new PKCS5S2ParametersGenerator(new SHA1Digest());

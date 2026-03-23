@@ -45,7 +45,7 @@ public final class CipherServiceImpl implements CipherService{
 
     private final String mEncryptionAlgorithm;
     private final int ivSize;
-    private final boolean isGcmMode;
+    private final boolean useGcmParameterSpec;
     private final Cipher mCipher;
 
     static CipherService getInstance(EncryptionAlgorithm algorithm){
@@ -59,6 +59,10 @@ public final class CipherServiceImpl implements CipherService{
                 return new CipherServiceImpl("AES", "GCM", "NoPadding", 12, true);
             }
 
+            case CHACHA20:{
+                return new CipherServiceImpl("ChaCha20-Poly1305", "None", "NoPadding", 12, false);
+            }
+
             case TripleDES:{
                 return new CipherServiceImpl("DESede", "CBC", "PKCS5Padding", 8, false);
             }
@@ -70,10 +74,10 @@ public final class CipherServiceImpl implements CipherService{
         }
     }
 
-    private CipherServiceImpl(String algorithm, String blockChaining, String paddingType, int ivSize, boolean isGcmMode) {
+    private CipherServiceImpl(String algorithm, String blockChaining, String paddingType, int ivSize, boolean useGcmParameterSpec) {
         this.mEncryptionAlgorithm = algorithm;
         this.ivSize = ivSize;
-        this.isGcmMode = isGcmMode;
+        this.useGcmParameterSpec = useGcmParameterSpec;
 
         try{
             String encryptionMode = String.format("%s/%s/%s", algorithm, blockChaining, paddingType);
@@ -127,7 +131,7 @@ public final class CipherServiceImpl implements CipherService{
     }
 
     private AlgorithmParameterSpec generateParameterSpec(byte[] iv){
-        if(isGcmMode){
+        if(useGcmParameterSpec){
             return new GCMParameterSpec(GCM_TAG_LENGTH_BITS, iv);
         }
         return new IvParameterSpec(iv);
