@@ -2,14 +2,14 @@ apply plugin: 'com.android.library'
 apply from: 'maven-push.gradle'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    namespace 'com.github.hussainderry.securepreferences'
+    compileSdk 33
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 28
-        versionCode 10
-        versionName "3.0.1"
+        targetSdkVersion 33
+        versionCode 13
+        versionName "5.0.0"
     }
 
     buildTypes {
@@ -18,13 +18,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    testImplementation 'junit:junit:' + rootProject.junitVersion;
-    api group: 'com.madgag.spongycastle', name: 'core', version: '1.58.0.0'
+    testImplementation 'junit:junit:' + rootProject.junitVersion
+    api group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: '1.78.1'
 }

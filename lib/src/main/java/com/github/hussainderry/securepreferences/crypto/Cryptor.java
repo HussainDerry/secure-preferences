@@ -16,24 +16,28 @@
 
 package com.github.hussainderry.securepreferences.crypto;
 
+import com.github.hussainderry.securepreferences.exception.DataIntegrityException;
+import com.github.hussainderry.securepreferences.exception.InvalidConfigurationException;
 import com.github.hussainderry.securepreferences.model.SecurityConfig;
 
-import org.spongycastle.crypto.PBEParametersGenerator;
-import org.spongycastle.crypto.digests.SHA1Digest;
-import org.spongycastle.crypto.digests.SHA256Digest;
-import org.spongycastle.crypto.digests.SHA512Digest;
-import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.spongycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.PBEParametersGenerator;
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.params.KeyParameter;
 
 import android.util.Base64;
 
+import java.io.Closeable;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 /**
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
  * @version 1.0
  * */
-public final class Cryptor {
+public final class Cryptor implements Closeable{
 
     /* Variables used for parsing the stored Base64 */
     private static final String SPLITTER = "\\.";
@@ -52,6 +56,9 @@ public final class Cryptor {
      * @param config The security configurations to use
      * */
     public static Cryptor initWithSecurityConfig(SecurityConfig config){
+        if(config == null){
+            throw new IllegalArgumentException("SecurityConfig cannot be null");
+        }
         return new Cryptor(config);
     }
 
@@ -65,6 +72,12 @@ public final class Cryptor {
 
         // Generating Session Password
         mPassword = pbkdf2(mSalt);
+    }
+
+    @Override
+    public void close(){
+        Arrays.fill(mPassword, (byte) 0);
+        Arrays.fill(mSalt, (byte) 0);
     }
 
     /**
@@ -92,7 +105,7 @@ public final class Cryptor {
     public byte[] decryptFromBase64(String encryptedBase64){
         String[] parts = encryptedBase64.split(SPLITTER);
         if(parts.length != 3){
-            throw new IllegalArgumentException("Malformed data string");
+            throw new DataIntegrityException("Malformed data string");
         }
 
         byte[] salt = fromBase64(parts[INDEX_SALT]);
@@ -129,7 +142,7 @@ public final class Cryptor {
             }
 
             default:{
-                throw new IllegalStateException("Unknown Digest!");
+                throw new InvalidConfigurationException("Unknown Digest: " + mSecurityConfig.getDigestType());
             }
 
         }

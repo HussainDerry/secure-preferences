@@ -16,19 +16,23 @@
 
 package com.github.hussainderry.securepreferences.crypto;
 
+import com.github.hussainderry.securepreferences.exception.CipherOperationException;
+import com.github.hussainderry.securepreferences.exception.DataIntegrityException;
+import com.github.hussainderry.securepreferences.exception.InvalidConfigurationException;
 import com.github.hussainderry.securepreferences.model.EncryptionAlgorithm;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.security.spec.AlgorithmParameterSpec;
 
+import javax.crypto.AEADBadTagException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -37,41 +41,45 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public final class CipherServiceImpl implements CipherService{
 
-    private final Logger mLogger;
+    private static final int GCM_TAG_LENGTH_BITS = 128;
+
     private final String mEncryptionAlgorithm;
     private final int ivSize;
+    private final boolean isGcmMode;
     private final Cipher mCipher;
 
-    public static CipherService getInstance(EncryptionAlgorithm algorithm){
+    static CipherService getInstance(EncryptionAlgorithm algorithm){
+        if(algorithm == null){
+            throw new InvalidConfigurationException("Algorithm cannot be null");
+        }
+
         switch(algorithm){
 
             case AES:{
-                return new CipherServiceImpl("AES", "GCM", "NoPadding", 12);
+                return new CipherServiceImpl("AES", "GCM", "NoPadding", 12, true);
             }
 
             case TripleDES:{
-                return new CipherServiceImpl("DESede", "CBC", "PKCS5Padding", 8);
+                return new CipherServiceImpl("DESede", "CBC", "PKCS5Padding", 8, false);
             }
 
             default:{
-                throw new IllegalArgumentException("Unknown Algorithm");
+                throw new InvalidConfigurationException("Unknown Algorithm: " + algorithm);
             }
 
         }
     }
 
-    private CipherServiceImpl(String algorithm, String blockChaining, String paddingType, int ivSize) {
+    private CipherServiceImpl(String algorithm, String blockChaining, String paddingType, int ivSize, boolean isGcmMode) {
         this.mEncryptionAlgorithm = algorithm;
         this.ivSize = ivSize;
-        this.mLogger = Logger.getLogger(CipherService.class.getName());
+        this.isGcmMode = isGcmMode;
 
         try{
             String encryptionMode = String.format("%s/%s/%s", algorithm, blockChaining, paddingType);
-            mLogger.info("Encryption-Mode: " + encryptionMode);
             mCipher = Cipher.getInstance(encryptionMode);
         }catch(NoSuchAlgorithmException | NoSuchPaddingException e){
-            mLogger.log(Level.SEVERE, "method: constructor()", e);
-            throw new IllegalStateException("Unable to initialize cipher, mode might not be supported");
+            throw new InvalidConfigurationException("Unable to initialize cipher, mode might not be supported", e);
         }
     }
 
@@ -82,26 +90,34 @@ public final class CipherServiceImpl implements CipherService{
 
     @Override
     public byte[] encrypt(byte[] key, byte[] iv, byte[] data) {
+        if(key == null || iv == null || data == null){
+            throw new IllegalArgumentException("Key, IV, and data cannot be null");
+        }
+
         synchronized(mCipher){
             try{
-                mCipher.init(Cipher.ENCRYPT_MODE, generateSecretKeySpec(key), generateIvParameterSpec(iv));
+                mCipher.init(Cipher.ENCRYPT_MODE, generateSecretKeySpec(key), generateParameterSpec(iv));
                 return mCipher.doFinal(data);
-            }catch(InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-                mLogger.log(Level.SEVERE, "method: encrypt()", e);
-                throw new IllegalStateException(String.format("%s: %s", e.getClass().getName(), e.getMessage()));
+            }catch(InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e){
+                throw new CipherOperationException("Encryption failed", e);
             }
         }
     }
 
     @Override
     public byte[] decrypt(byte[] key, byte[] iv, byte[] data) {
+        if(key == null || iv == null || data == null){
+            throw new IllegalArgumentException("Key, IV, and data cannot be null");
+        }
+
         synchronized(mCipher){
             try{
-                mCipher.init(Cipher.DECRYPT_MODE, generateSecretKeySpec(key), generateIvParameterSpec(iv));
+                mCipher.init(Cipher.DECRYPT_MODE, generateSecretKeySpec(key), generateParameterSpec(iv));
                 return mCipher.doFinal(data);
-            }catch(InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
-                mLogger.log(Level.SEVERE, "method: decrypt()", e);
-                throw new IllegalStateException(String.format("%s: %s", e.getClass().getName(), e.getMessage()));
+            }catch(AEADBadTagException e){
+                throw new DataIntegrityException("Authentication failed: wrong password or tampered data", e);
+            }catch(InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e){
+                throw new CipherOperationException("Decryption failed", e);
             }
         }
     }
@@ -110,7 +126,10 @@ public final class CipherServiceImpl implements CipherService{
         return new SecretKeySpec(key, mEncryptionAlgorithm);
     }
 
-    private IvParameterSpec generateIvParameterSpec(byte[] iv){
+    private AlgorithmParameterSpec generateParameterSpec(byte[] iv){
+        if(isGcmMode){
+            return new GCMParameterSpec(GCM_TAG_LENGTH_BITS, iv);
+        }
         return new IvParameterSpec(iv);
     }
 }

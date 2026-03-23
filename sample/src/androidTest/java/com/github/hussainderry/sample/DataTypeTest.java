@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,7 +27,7 @@ public class DataTypeTest{
 
 	@BeforeClass
 	public static void init(){
-		mConfig = new SecurityConfig.Builder(PASSWORD)
+		mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
 				.setDigestType(DigestType.SHA512)
 				.setEncryptionAlgorithm(EncryptionAlgorithm.AES)
 				.setPbkdf2Iterations(10_000)
@@ -38,7 +38,7 @@ public class DataTypeTest{
 
 	@Test
 	public void testNumbers(){
-		Context context = InstrumentationRegistry.getTargetContext();
+		Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 		SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
 		SecurePreferences.Editor mEditor = mPreferences.edit();
 
@@ -54,7 +54,7 @@ public class DataTypeTest{
 
 	@Test
 	public void testStrings(){
-		Context context = InstrumentationRegistry.getTargetContext();
+		Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 		SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
 		SecurePreferences.Editor mEditor = mPreferences.edit();
 
@@ -73,7 +73,7 @@ public class DataTypeTest{
 
 	@Test
 	public void testBoolean(){
-		Context context = InstrumentationRegistry.getTargetContext();
+		Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 		SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
 		SecurePreferences.Editor mEditor = mPreferences.edit();
 

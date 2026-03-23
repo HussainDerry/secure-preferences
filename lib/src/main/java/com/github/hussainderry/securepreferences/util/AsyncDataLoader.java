@@ -23,12 +23,19 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helps get data from shared preferences asynchronously
  * @author Hussain Al-Derry
  */
-public class AsyncDataLoader{
+public final class AsyncDataLoader{
+
+    private static final int CORE_POOL_SIZE = 2;
+    private static final int MAX_POOL_SIZE = 4;
+    private static final long KEEP_ALIVE_SECONDS = 30L;
 
     private final SharedPreferences mPreferences;
     private final ExecutorService mExecutorService;
@@ -39,7 +46,14 @@ public class AsyncDataLoader{
         }
 
         this.mPreferences = preferences;
-        this.mExecutorService = Executors.newCachedThreadPool();
+        this.mExecutorService = new ThreadPoolExecutor(
+                CORE_POOL_SIZE, MAX_POOL_SIZE,
+                KEEP_ALIVE_SECONDS, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>());
+    }
+
+    public void shutdown(){
+        mExecutorService.shutdown();
     }
 
     public Future<String> getString(final String key, final String defValue) {

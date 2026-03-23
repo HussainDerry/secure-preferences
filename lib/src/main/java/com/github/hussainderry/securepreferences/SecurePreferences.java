@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 
+import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,11 +34,11 @@ import java.util.Set;
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
  * @version 1.0
  * */
-public final class SecurePreferences implements SharedPreferences{
+public final class SecurePreferences implements SharedPreferences, Closeable{
 
     private static final String CHARSET = "UTF-8";
     private final Cryptor mCryptor;
-    private SharedPreferences mProxyPreferences;
+    private final SharedPreferences mProxyPreferences;
 
     /**
      * Creates an instance of the preferences using the provided security configurations.
@@ -63,7 +64,7 @@ public final class SecurePreferences implements SharedPreferences{
             byte[] mBytes = HashSHA.hashUsingSHA256(key.getBytes(CHARSET));
             return Base64.encodeToString(mBytes, Base64.NO_WRAP);
         }catch(UnsupportedEncodingException e){
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException("Charset not supported: " + CHARSET, e);
         }
     }
 
@@ -71,7 +72,7 @@ public final class SecurePreferences implements SharedPreferences{
         try{
             return mCryptor.encryptToBase64(data.getBytes(CHARSET));
         }catch(UnsupportedEncodingException e){
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException("Charset not supported: " + CHARSET, e);
         }
     }
 
@@ -80,7 +81,7 @@ public final class SecurePreferences implements SharedPreferences{
             byte[] decrypted = mCryptor.decryptFromBase64(base64Data);
             return new String(decrypted, CHARSET);
         }catch(UnsupportedEncodingException e){
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException("Charset not supported: " + CHARSET, e);
         }
     }
 
@@ -158,9 +159,14 @@ public final class SecurePreferences implements SharedPreferences{
         return new AsyncDataLoader(this);
     }
 
+    @Override
+    public void close(){
+        mCryptor.close();
+    }
+
     public final class Editor implements SharedPreferences.Editor{
 
-        protected SharedPreferences.Editor mProxyEditor;
+        private final SharedPreferences.Editor mProxyEditor;
 
         public Editor(){
             this.mProxyEditor = SecurePreferences.this.mProxyPreferences.edit();

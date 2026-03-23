@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 /**
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
@@ -24,12 +24,12 @@ public class SecurityConfigTest {
 
     @Test
     public void testAes128Sha512() throws Exception{
-        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .setDigestType(DigestType.SHA512)
                 .setKeySize(128)
                 .build();
 
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
         SecurePreferences.Editor mEditor = mPreferences.edit();
         mEditor.putString("msg", MSG).commit();
@@ -40,13 +40,13 @@ public class SecurityConfigTest {
 
     @Test
     public void testAes196Sha256() throws Exception{
-        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .setDigestType(DigestType.SHA256)
                 .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
                 .setKeySize(196)
                 .build();
 
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
         SecurePreferences.Editor mEditor = mPreferences.edit();
         mEditor.putString("msg", MSG).commit();
@@ -57,14 +57,14 @@ public class SecurityConfigTest {
 
     @Test
     public void testAes256Sha512() throws Exception{
-        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .setDigestType(DigestType.SHA512)
                 .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
                 .setKeySize(256)
                 .setPbkdf2Iterations(80000)
                 .build();
 
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
         SecurePreferences.Editor mEditor = mPreferences.edit();
         mEditor.putString("msg", MSG).commit();
@@ -75,13 +75,13 @@ public class SecurityConfigTest {
 
     @Test
     public void testAes256Sha1() throws Exception{
-        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .setDigestType(DigestType.SHA1)
                 .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
                 .setKeySize(256)
                 .build();
 
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
         SecurePreferences.Editor mEditor = mPreferences.edit();
         mEditor.putString("msg", MSG).commit();
@@ -92,13 +92,13 @@ public class SecurityConfigTest {
 
     @Test
     public void testAes128Sha1() throws Exception{
-        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .setDigestType(DigestType.SHA1)
                 .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
                 .setKeySize(128)
                 .build();
 
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
         SecurePreferences.Editor mEditor = mPreferences.edit();
         mEditor.putString("msg", MSG).commit();
@@ -109,13 +109,13 @@ public class SecurityConfigTest {
 
     @Test
     public void testTripleDes128Sha256(){
-        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .setDigestType(DigestType.SHA256)
                 .setEncryptionAlgorithm(EncryptionAlgorithm.TripleDES)
                 .setKeySize(128)
                 .build();
 
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
         SecurePreferences.Editor mEditor = mPreferences.edit();
         mEditor.putString("msg", MSG).commit();
@@ -126,13 +126,13 @@ public class SecurityConfigTest {
 
     @Test
     public void testTripleDes192Sha512(){
-        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .setDigestType(DigestType.SHA512)
                 .setEncryptionAlgorithm(EncryptionAlgorithm.TripleDES)
                 .setKeySize(192)
                 .build();
 
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
         SecurePreferences.Editor mEditor = mPreferences.edit();
         mEditor.putString("msg", MSG).commit();
@@ -143,10 +143,10 @@ public class SecurityConfigTest {
 
     @Test
     public void testDefault() throws Exception{
-        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig mConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .build();
 
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SecurePreferences mPreferences = SecurePreferences.getInstance(context, "myfile", mConfig);
         SecurePreferences.Editor mEditor = mPreferences.edit();
         mEditor.putString("msg", MSG).commit();

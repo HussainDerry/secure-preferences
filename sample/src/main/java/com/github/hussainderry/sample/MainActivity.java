@@ -8,9 +8,9 @@ import com.github.hussainderry.securepreferences.util.AsyncDataLoader;
 
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
@@ -32,11 +32,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Minimum Configurations
-        SecurityConfig minimumConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig minimumConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .build();
 
         // Full Configurations
-        SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD)
+        SecurityConfig fullConfig = new SecurityConfig.Builder(PASSWORD.toCharArray())
                 .setKeySize(256)
                 .setEncryptionAlgorithm(EncryptionAlgorithm.AES)
                 .setPbkdf2SaltSize(64)

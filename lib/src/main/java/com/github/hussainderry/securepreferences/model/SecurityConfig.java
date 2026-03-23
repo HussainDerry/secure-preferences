@@ -16,6 +16,8 @@
 
 package com.github.hussainderry.securepreferences.model;
 
+import com.github.hussainderry.securepreferences.exception.InvalidConfigurationException;
+
 import java.util.Arrays;
 
 /**
@@ -23,7 +25,7 @@ import java.util.Arrays;
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
  * @version 1.0
  * */
-public class SecurityConfig {
+public final class SecurityConfig {
 
     private final char[] mPassword;
     private final int iPBKDF2_Iterations;
@@ -58,12 +60,12 @@ public class SecurityConfig {
         if(keySizeCheck){
             this.keySize = keySize;
         }else{
-            throw new IllegalArgumentException("Key size is invalid for the selected algorithm");
+            throw new InvalidConfigurationException("Key size is invalid for the selected algorithm");
         }
     }
 
     public char[] getPassword() {
-        return mPassword;
+        return Arrays.copyOf(mPassword, mPassword.length);
     }
 
     public int getPBKDF2Iterations() {
@@ -88,7 +90,8 @@ public class SecurityConfig {
 
     public static class Builder{
 
-        private static final int DEFAULT_ITERATIONS = 1000;
+        private static final int DEFAULT_ITERATIONS = 210_000;
+        private static final int MIN_ITERATIONS = 10_000;
         private static final int DEFAULT_SALT_SIZE = 32;
         private static final int DEFAULT_AES_KEY_SIZE = 128;
         private static final DigestType DEFAULT_DIGEST = DigestType.SHA256;
@@ -101,11 +104,11 @@ public class SecurityConfig {
         private int aesKeySize = -1;
         private EncryptionAlgorithm algorithm;
 
-        public Builder(String password){
-            if(password == null){
-                throw new IllegalArgumentException("Password cannot be null!");
+        public Builder(char[] password){
+            if(password == null || password.length == 0){
+                throw new IllegalArgumentException("Password cannot be null or empty!");
             }
-            this.password = password.toCharArray();
+            this.password = Arrays.copyOf(password, password.length);
         }
 
         /**
@@ -113,8 +116,9 @@ public class SecurityConfig {
          * @param iterations The number of iterations
          * */
         public Builder setPbkdf2Iterations(int iterations){
-            if(iterations < 0){
-                throw new IllegalArgumentException("Iterations cannot be less than zero!");
+            if(iterations < MIN_ITERATIONS){
+                throw new InvalidConfigurationException(
+                        String.format("Iterations cannot be less than %d!", MIN_ITERATIONS));
             }
             this.iterations = iterations;
             return this;
@@ -126,7 +130,7 @@ public class SecurityConfig {
          * */
         public Builder setPbkdf2SaltSize(int saltSize){
             if(saltSize < 8 || (saltSize % 8) != 0){
-                throw new IllegalArgumentException("Illegal salt size!");
+                throw new InvalidConfigurationException("Illegal salt size!");
             }
 
             this.saltSize = saltSize;

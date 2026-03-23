@@ -23,7 +23,9 @@ import java.security.NoSuchAlgorithmException;
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
  * @version 0.1
  * */
-public class HashSHA {
+public final class HashSHA {
+
+    private HashSHA(){}
 
     /**
      * Hashes the given data using SHA-256
@@ -35,7 +37,7 @@ public class HashSHA {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             return digest.digest(data);
         }catch(NoSuchAlgorithmException e){
-            throw new IllegalStateException("Unable to hash!");
+            throw new IllegalStateException("SHA-256 not available", e);
         }
     }
 
@@ -49,7 +51,7 @@ public class HashSHA {
             MessageDigest digest = MessageDigest.getInstance("SHA-512");
             return digest.digest(data);
         }catch(NoSuchAlgorithmException e){
-            throw new IllegalStateException("Unable to hash!");
+            throw new IllegalStateException("SHA-512 not available", e);
         }
     }
 }
