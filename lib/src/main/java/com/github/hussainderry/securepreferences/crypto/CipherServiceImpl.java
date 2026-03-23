@@ -26,13 +26,11 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 
-import javax.crypto.AEADBadTagException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -118,9 +116,12 @@ public final class CipherServiceImpl implements CipherService{
             try{
                 mCipher.init(Cipher.DECRYPT_MODE, generateSecretKeySpec(key), generateParameterSpec(iv));
                 return mCipher.doFinal(data);
-            }catch(AEADBadTagException e){
-                throw new DataIntegrityException("Authentication failed: wrong password or tampered data", e);
-            }catch(InvalidAlgorithmParameterException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e){
+            }catch(BadPaddingException e){
+                if("javax.crypto.AEADBadTagException".equals(e.getClass().getName())){
+                    throw new DataIntegrityException("Authentication failed: wrong password or tampered data", e);
+                }
+                throw new CipherOperationException("Decryption failed", e);
+            }catch(InvalidAlgorithmParameterException | InvalidKeyException | IllegalBlockSizeException e){
                 throw new CipherOperationException("Decryption failed", e);
             }
         }
@@ -132,7 +133,15 @@ public final class CipherServiceImpl implements CipherService{
 
     private AlgorithmParameterSpec generateParameterSpec(byte[] iv){
         if(useGcmParameterSpec){
-            return new GCMParameterSpec(GCM_TAG_LENGTH_BITS, iv);
+            try{
+                Class<?> gcmClass = Class.forName("javax.crypto.spec.GCMParameterSpec");
+                return (AlgorithmParameterSpec) gcmClass
+                        .getConstructor(int.class, byte[].class)
+                        .newInstance(GCM_TAG_LENGTH_BITS, iv);
+            }catch(Exception e){
+                // API < 19: fall back to IvParameterSpec
+                return new IvParameterSpec(iv);
+            }
         }
         return new IvParameterSpec(iv);
     }

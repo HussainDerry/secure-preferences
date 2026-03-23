@@ -33,7 +33,7 @@ dependencyResolutionManagement {
 Add the dependency to your module `build.gradle`:
 
 ```groovy
-implementation 'com.github.HussainDerry:secure-preferences:v5.2.0'
+implementation 'com.github.HussainDerry:secure-preferences:v5.2.1'
 ```
 
 ## Sample Usage
