@@ -26,19 +26,30 @@ import android.util.Base64;
 
 import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Hussain Al-Derry <hussain.derry@gmail.com>
- * @version 1.0
+ * @version 2.0
  * */
 public final class SecurePreferences implements SharedPreferences, Closeable{
 
     private static final String CHARSET = "UTF-8";
+    private static final String KEY_REGISTRY = "__sp_key_registry__";
+
     private final Cryptor mCryptor;
     private final SharedPreferences mProxyPreferences;
+    private final String mRegistryHashedKey;
+
+    /* Maps hashed keys to original keys for listener translation */
+    private final Map<String, String> mKeyMap = new ConcurrentHashMap<>();
+
+    /* Wraps user listeners to translate hashed keys back to originals */
+    private final Map<OnSharedPreferenceChangeListener, OnSharedPreferenceChangeListener> mListenerMap = new ConcurrentHashMap<>();
 
     /**
      * Creates an instance of the preferences using the provided security configurations.
@@ -57,6 +68,34 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
     private SecurePreferences(Context context, String fileName, SecurityConfig securityConfig) {
         this.mCryptor = Cryptor.initWithSecurityConfig(securityConfig);
         this.mProxyPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE);
+        this.mRegistryHashedKey = generateKeyHash(KEY_REGISTRY);
+        loadKeyRegistry();
+    }
+
+    private void loadKeyRegistry(){
+        Set<String> encryptedKeys = mProxyPreferences.getStringSet(mRegistryHashedKey, null);
+        if(encryptedKeys != null){
+            for(String encryptedKey : encryptedKeys){
+                String originalKey = decryptFromBase64(encryptedKey);
+                String hashedKey = generateKeyHash(originalKey);
+                mKeyMap.put(hashedKey, originalKey);
+            }
+        }
+    }
+
+    private void registerKey(String originalKey, String hashedKey, SharedPreferences.Editor editor){
+        mKeyMap.put(hashedKey, originalKey);
+        Set<String> encryptedKeys = new HashSet<>(mProxyPreferences.getStringSet(mRegistryHashedKey, new HashSet<String>()));
+        encryptedKeys.add(encryptToBase64(originalKey));
+        editor.putStringSet(mRegistryHashedKey, encryptedKeys);
+    }
+
+    private void unregisterKey(String originalKey, SharedPreferences.Editor editor){
+        String hashedKey = generateKeyHash(originalKey);
+        mKeyMap.remove(hashedKey);
+        Set<String> encryptedKeys = new HashSet<>(mProxyPreferences.getStringSet(mRegistryHashedKey, new HashSet<String>()));
+        encryptedKeys.remove(encryptToBase64(originalKey));
+        editor.putStringSet(mRegistryHashedKey, encryptedKeys);
     }
 
     private String generateKeyHash(String key){
@@ -85,9 +124,23 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
         }
     }
 
+    /**
+     * Returns a map of all stored key-value pairs. All values are returned as
+     * their encrypted string representation since type information is not preserved.
+     * @return Map of original keys to decrypted string values
+     * */
     @Override
     public Map<String, ?> getAll() {
-        throw new UnsupportedOperationException("Operation Not Supported!");
+        Map<String, String> result = new HashMap<>();
+        for(Map.Entry<String, String> entry : mKeyMap.entrySet()){
+            String hashedKey = entry.getKey();
+            String originalKey = entry.getValue();
+            String encryptedValue = mProxyPreferences.getString(hashedKey, null);
+            if(encryptedValue != null){
+                result.put(originalKey, decryptFromBase64(encryptedValue));
+            }
+        }
+        return result;
     }
 
     @Override
@@ -146,13 +199,26 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
     }
 
     @Override
-    public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
-        mProxyPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
+    public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+        OnSharedPreferenceChangeListener wrapper = new OnSharedPreferenceChangeListener(){
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String hashedKey){
+                String originalKey = mKeyMap.get(hashedKey);
+                if(originalKey != null){
+                    listener.onSharedPreferenceChanged(SecurePreferences.this, originalKey);
+                }
+            }
+        };
+        mListenerMap.put(listener, wrapper);
+        mProxyPreferences.registerOnSharedPreferenceChangeListener(wrapper);
     }
 
     @Override
-    public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
-        mProxyPreferences.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
+    public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
+        OnSharedPreferenceChangeListener wrapper = mListenerMap.remove(listener);
+        if(wrapper != null){
+            mProxyPreferences.unregisterOnSharedPreferenceChangeListener(wrapper);
+        }
     }
 
     public AsyncDataLoader getAsyncDataLoader(){
@@ -177,6 +243,7 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(data);
             mProxyEditor.putString(hashedKey, encryptedData);
+            registerKey(key, hashedKey, mProxyEditor);
             return this;
         }
 
@@ -190,6 +257,7 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
             }
 
             mProxyEditor.putStringSet(hashedKey, encryptedSet);
+            registerKey(key, hashedKey, mProxyEditor);
             return this;
         }
 
@@ -198,6 +266,7 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(Integer.toString(data));
             mProxyEditor.putString(hashedKey, encryptedData);
+            registerKey(key, hashedKey, mProxyEditor);
             return this;
         }
 
@@ -206,6 +275,7 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(Long.toString(data));
             mProxyEditor.putString(hashedKey, encryptedData);
+            registerKey(key, hashedKey, mProxyEditor);
             return this;
         }
 
@@ -214,6 +284,7 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(Float.toString(data));
             mProxyEditor.putString(hashedKey, encryptedData);
+            registerKey(key, hashedKey, mProxyEditor);
             return this;
         }
 
@@ -222,18 +293,21 @@ public final class SecurePreferences implements SharedPreferences, Closeable{
             String hashedKey = generateKeyHash(key);
             String encryptedData = encryptToBase64(Boolean.toString(data));
             mProxyEditor.putString(hashedKey, encryptedData);
+            registerKey(key, hashedKey, mProxyEditor);
             return this;
         }
 
         @Override
         public SecurePreferences.Editor remove(String key) {
             mProxyEditor.remove(generateKeyHash(key));
+            unregisterKey(key, mProxyEditor);
             return this;
         }
 
         @Override
         public SecurePreferences.Editor clear() {
             mProxyEditor.clear();
+            mKeyMap.clear();
             return this;
         }
 

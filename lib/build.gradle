@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 33
-        versionCode 13
-        versionName "5.0.0"
+        versionCode 14
+        versionName "5.1.0"
         consumerProguardFiles 'consumer-rules.pro'
     }
 

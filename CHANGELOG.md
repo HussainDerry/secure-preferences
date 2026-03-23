@@ -3,6 +3,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.1.0] - 2026-03-23
+
+### Added
+
+* `getAll()` support with persistent encrypted key registry
+* Change listeners now receive original key names instead of hashed keys
+* Storage format versioning (`v1.salt.iv.ciphertext`) with backward compatibility
+* Main-thread callback delivery for `AsyncDataLoader`
+* `AsyncDataLoader` constructor overload accepting custom `Handler`
+* 20 new instrumentation tests (32 total)
+
+### Changed
+
+* `TripleDES` deprecated (NIST SP 800-67 Rev 2), will be removed in v6
+* ProGuard/R8 consumer rules now shipped with the AAR
+* Use-after-close guard on `Cryptor` prevents silent data corruption
+
+### Fixed
+
+* `DataTypeTest` was reading wrong keys for `getLong` and `getFloat` assertions
+* All tests now use JUnit `Assert` instead of `assert` keyword
+
 ## [5.0.0] - 2026-03-23
 
 ### Added

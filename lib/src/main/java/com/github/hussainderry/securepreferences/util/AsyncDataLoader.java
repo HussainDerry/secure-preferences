@@ -17,6 +17,8 @@
 package com.github.hussainderry.securepreferences.util;
 
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -38,13 +40,19 @@ public final class AsyncDataLoader{
 
     private final SharedPreferences mPreferences;
     private final ExecutorService mExecutorService;
+    private final Handler mCallbackHandler;
 
     public AsyncDataLoader(SharedPreferences preferences){
+        this(preferences, new Handler(Looper.getMainLooper()));
+    }
+
+    public AsyncDataLoader(SharedPreferences preferences, Handler callbackHandler){
         if(preferences == null){
             throw new IllegalArgumentException("Param cannot be null!");
         }
 
         this.mPreferences = preferences;
+        this.mCallbackHandler = callbackHandler;
         this.mExecutorService = new ThreadPoolExecutor(
                 CORE_POOL_SIZE, MAX_POOL_SIZE,
                 KEEP_ALIVE_SECONDS, TimeUnit.SECONDS,
@@ -113,7 +121,11 @@ public final class AsyncDataLoader{
         mExecutorService.execute(new Runnable(){
             @Override
             public void run(){
-                callback.onDataLoaded(mPreferences.getString(key, defValue));
+                final String result = mPreferences.getString(key, defValue);
+                mCallbackHandler.post(new Runnable(){
+                    @Override
+                    public void run(){ callback.onDataLoaded(result); }
+                });
             }
         });
     }
@@ -122,7 +134,11 @@ public final class AsyncDataLoader{
         mExecutorService.execute(new Runnable(){
             @Override
             public void run(){
-                callback.onDataLoaded(mPreferences.getStringSet(key, defSet));
+                final Set<String> result = mPreferences.getStringSet(key, defSet);
+                mCallbackHandler.post(new Runnable(){
+                    @Override
+                    public void run(){ callback.onDataLoaded(result); }
+                });
             }
         });
     }
@@ -131,7 +147,11 @@ public final class AsyncDataLoader{
         mExecutorService.execute(new Runnable(){
             @Override
             public void run(){
-                callback.onDataLoaded(mPreferences.getInt(key, defValue));
+                final int result = mPreferences.getInt(key, defValue);
+                mCallbackHandler.post(new Runnable(){
+                    @Override
+                    public void run(){ callback.onDataLoaded(result); }
+                });
             }
         });
     }
@@ -140,7 +160,11 @@ public final class AsyncDataLoader{
         mExecutorService.execute(new Runnable(){
             @Override
             public void run(){
-                callback.onDataLoaded(mPreferences.getLong(key, defValue));
+                final long result = mPreferences.getLong(key, defValue);
+                mCallbackHandler.post(new Runnable(){
+                    @Override
+                    public void run(){ callback.onDataLoaded(result); }
+                });
             }
         });
     }
@@ -149,7 +173,11 @@ public final class AsyncDataLoader{
         mExecutorService.execute(new Runnable(){
             @Override
             public void run(){
-                callback.onDataLoaded(mPreferences.getFloat(key, defValue));
+                final float result = mPreferences.getFloat(key, defValue);
+                mCallbackHandler.post(new Runnable(){
+                    @Override
+                    public void run(){ callback.onDataLoaded(result); }
+                });
             }
         });
     }
@@ -158,7 +186,11 @@ public final class AsyncDataLoader{
         mExecutorService.execute(new Runnable(){
             @Override
             public void run(){
-                callback.onDataLoaded(mPreferences.getBoolean(key, defValue));
+                final boolean result = mPreferences.getBoolean(key, defValue);
+                mCallbackHandler.post(new Runnable(){
+                    @Override
+                    public void run(){ callback.onDataLoaded(result); }
+                });
             }
         });
     }

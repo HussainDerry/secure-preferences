@@ -39,7 +39,8 @@ import java.util.Arrays;
  * */
 public final class Cryptor implements Closeable{
 
-    /* Variables used for parsing the stored Base64 */
+    /* Storage format versioning */
+    private static final String FORMAT_VERSION = "v1";
     private static final String SPLITTER = "\\.";
     private static final int INDEX_SALT = 0;
     private static final int INDEX_IV = 1;
@@ -102,7 +103,7 @@ public final class Cryptor implements Closeable{
         mRandom.nextBytes(iv);
 
         byte[] encrypted = mCipherService.encrypt(mPassword, iv, data);
-        return String.format("%s.%s.%s", toBase64(mSalt), toBase64(iv), toBase64(encrypted));
+        return String.format("%s.%s.%s.%s", FORMAT_VERSION, toBase64(mSalt), toBase64(iv), toBase64(encrypted));
     }
 
     /**
@@ -114,13 +115,21 @@ public final class Cryptor implements Closeable{
     public byte[] decryptFromBase64(String encryptedBase64){
         checkNotClosed();
         String[] parts = encryptedBase64.split(SPLITTER);
-        if(parts.length != 3){
+
+        int offset;
+        if(parts.length == 4 && parts[0].startsWith("v")){
+            // Versioned format: version.salt.iv.ciphertext
+            offset = 1;
+        }else if(parts.length == 3){
+            // Legacy format: salt.iv.ciphertext
+            offset = 0;
+        }else{
             throw new DataIntegrityException("Malformed data string");
         }
 
-        byte[] salt = fromBase64(parts[INDEX_SALT]);
-        byte[] iv = fromBase64(parts[INDEX_IV]);
-        byte[] cipherText = fromBase64(parts[INDEX_CIPHER_TEXT]);
+        byte[] salt = fromBase64(parts[offset + INDEX_SALT]);
+        byte[] iv = fromBase64(parts[offset + INDEX_IV]);
+        byte[] cipherText = fromBase64(parts[offset + INDEX_CIPHER_TEXT]);
 
         return mCipherService.decrypt(pbkdf2(salt), iv, cipherText);
     }
